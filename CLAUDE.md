@@ -56,9 +56,6 @@ Kør det før hvert commit.
 | `settings.py` | Alt administrator kan rette. Standarder her, ændringer i `settings.json`. |
 | `static/` | Hele frontenden. |
 
-`index.html` i roden er en gammel første version; den rigtige forside er
-`static/index.html`.
-
 ## Regler
 
 - **Claude leverer til main; Martin leverer til produktion.** Push til
