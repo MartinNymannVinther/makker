@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="da" data-tema="lys">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="light dark" />
+<title>AKA Assistent</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%235f30c5'/%3E%3Ctext x='16' y='22' font-family='system-ui,sans-serif' font-size='17' font-weight='600' fill='%23fff' text-anchor='middle'%3EA%3C/text%3E%3C/svg%3E" />
+<link rel="stylesheet" href="/static/app.css" />
+<script>
+  // Sæt temaet før første maling, så siden ikke blinker hvidt i mørk tilstand.
+  (function(){
+    var gemt = null;
+    try { gemt = localStorage.getItem('aka-tema'); } catch (e) {}
+    var mørk = gemt ? gemt === 'moerk'
+                    : matchMedia('(prefers-color-scheme: dark)').matches;
+    document.documentElement.dataset.tema = mørk ? 'moerk' : 'lys';
+  })();
+</script>
+</head>
+<body>
+
+<div class="app" id="app">
+
+  <!-- Gemte samtaler. Fast spalte på store skærme, skuffe på små. -->
+  <aside class="sidebar" id="sidebar" aria-label="Gemte samtaler">
+    <div class="sidebar-top">
+      <div class="brand">
+        <div class="mark" aria-hidden="true">A</div>
+        <div class="brand-tekst">
+          <b>AKA Assistent</b>
+          <span>Intern chat</span>
+        </div>
+      </div>
+      <button class="ikon" id="lukSidebar" aria-label="Skjul samtaler"
+              data-ikon="luk"></button>
+    </div>
+
+    <button class="ny-chat" id="nyChat">
+      <span data-ikon="plus" aria-hidden="true"></span> Ny chat
+    </button>
+
+    <nav class="chats" id="chats"></nav>
+
+    <p class="sidebar-fod">
+      Samtaler gemmes kun i denne browser og sendes ikke til serveren.
+    </p>
+  </aside>
+
+  <div class="skygge" id="skygge" hidden></div>
+
+  <main class="main">
+    <header>
+      <button class="ikon kun-lille" id="visSidebar" aria-label="Vis samtaler"
+              data-ikon="menu"></button>
+
+      <h1 class="chat-titel" id="chatTitel">Ny chat</h1>
+
+      <div class="header-hoejre">
+        <div class="vaelger">
+          <select id="model" aria-label="Vælg model"></select>
+          <span data-ikon="chevron" aria-hidden="true"></span>
+        </div>
+        <button class="ikon" id="tema" aria-label="Skift mellem lys og mørk"></button>
+        <button class="ikon" id="indstillinger" aria-label="Indstillinger"
+                title="Indstillinger" data-ikon="tandhjul"></button>
+      </div>
+    </header>
+
+    <div class="log" id="log" role="log" aria-live="polite" aria-relevant="additions"></div>
+
+    <button class="til-bund" id="tilBund" aria-label="Gå til nyeste besked"
+            data-ikon="ned" hidden></button>
+
+    <footer>
+      <form class="composer" id="composer">
+        <div class="composer-top">
+          <div class="vaelger lille">
+            <select id="rolle" aria-label="Vælg rolle"></select>
+            <span data-ikon="chevron" aria-hidden="true"></span>
+          </div>
+          <button type="button" class="opgaveknap" id="opgaver">
+            <span data-ikon="liste" aria-hidden="true"></span> Opgaver
+          </button>
+        </div>
+        <div class="vedhaeft" id="vedhaeft"></div>
+        <div class="composer-raekke">
+          <button type="button" class="ikon clip" id="clip"
+                  aria-label="Vedhæft fil" data-ikon="clip"></button>
+          <label class="visuelt-skjult" for="box">Skriv en besked</label>
+          <textarea id="box" rows="1" enterkeyhint="send"
+                    placeholder="Skriv en besked"></textarea>
+          <button type="submit" class="send" id="send"
+                  aria-label="Send" data-ikon="op"></button>
+        </div>
+      </form>
+      <p class="ansvar">Svarene kan indeholde fejl. Tjek vigtige oplysninger i sagsgrundlaget.</p>
+      <input type="file" id="file" hidden />
+    </footer>
+
+    <!-- Administratorsiden. Bygges af app.js, afsnit 15. -->
+    <dialog class="ark" id="ark" aria-labelledby="ark-titel">
+      <div class="ark-top">
+        <h2 id="ark-titel">Indstillinger</h2>
+        <button class="ikon" id="lukArk" aria-label="Luk" data-ikon="luk"></button>
+      </div>
+      <div class="ark-krop" id="ark-krop"></div>
+      <div class="ark-fod">
+        <span class="ark-status" id="ark-status" aria-live="polite"></span>
+        <button type="button" class="ark-knap" id="nulstilArk">Nulstil alt</button>
+        <button type="button" class="ark-knap primaer" id="gemArk">Gem</button>
+      </div>
+    </dialog>
+
+    <!-- Opgavebiblioteket. Indholdet kommer fra indstillingerne. -->
+    <dialog class="ark" id="opgaveark" aria-labelledby="opgaveark-titel">
+      <div class="ark-top">
+        <h2 id="opgaveark-titel">Opgaver</h2>
+        <button class="ikon" id="lukOpgaver" aria-label="Luk" data-ikon="luk"></button>
+      </div>
+      <div class="ark-krop" id="opgaveark-krop"></div>
+    </dialog>
+
+    <!-- Vises kun mens en fil trækkes hen over vinduet. -->
+    <div class="drop" id="drop" hidden>
+      <div class="drop-kort">
+        <span data-ikon="fil" aria-hidden="true"></span>
+        Slip filen for at vedhæfte den
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- PII-filteret først: app.js bruger PII.scan() når der trykkes send. -->
+<script src="/static/pii.js"></script>
+<script src="/static/app.js"></script>
+</body>
+</html>

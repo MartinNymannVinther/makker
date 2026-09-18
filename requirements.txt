@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+openai
+httpx               # Ollama-opslag og fal.ai-kald
+python-dotenv
+python-multipart   # FastAPI's filupload
+pypdf              # tekst ud af PDF
+python-docx        # tekst ud af .docx — og Word-dokumenter ud af chatten
+python-pptx        # PowerPoint ud af chatten

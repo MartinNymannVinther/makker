@@ -1,0 +1,162 @@
+REFERAT — ARBEJDSGRUPPEN FOR DIGITAL SUVERÆNITET
+Testdata. Deltagere, tal og interne beslutninger er opdigtede.
+
+Sagsnr.:    DIG-2026-0092
+Møde nr.:   4
+Dato:       28. maj 2026, kl. 13.00-15.30
+Sted:       Mødelokale Nord samt online
+Referent:   Mette Iversen
+
+
+DELTAGERE
+
+Hanne Lund (formand, direktionen)
+Peter Krogh (IT-drift)
+Mette Iversen (jura og databeskyttelse)
+Søren Balle (indkøb)
+Yasmin Haddad (digitalisering, deltog online)
+
+Afbud: Lars Overgaard (kommunikation)
+
+
+DAGSORDEN
+
+1. Opsamling siden sidst
+2. Kortlægning af vores nuværende afhængigheder
+3. Det regulatoriske billede i EU
+4. Tre scenarier for de næste tre år
+5. Indvendinger og risici
+6. Beslutninger og opfølgning
+
+
+1. OPSAMLING SIDEN SIDST
+
+Hanne Lund indledte med at minde om, at arbejdsgruppen blev nedsat i januar
+efter direktionens beslutning om at få et samlet billede af, hvor afhængige
+vi er af leverandører uden for EU. Diskussionen er ikke drevet af en konkret
+hændelse, men af at spørgsmålet er blevet stillet af både bestyrelsen og af
+et par større medlemsgrupper.
+
+Peter Krogh bemærkede, at debatten har flyttet sig markant det seneste år.
+Hvor det tidligere handlede om jura, handler det nu i lige så høj grad om
+driftsrisiko: hvad sker der, hvis adgangen til en tjeneste bliver afbrudt
+af årsager, vi ikke selv er herre over.
+
+
+2. KORTLÆGNING AF VORES NUVÆRENDE AFHÆNGIGHEDER
+
+Peter Krogh fremlagde kortlægningen, der blev afsluttet i april.
+
+Vi anvender i dag 34 eksterne SaaS-tjenester. Af dem har 21 hovedsæde i
+USA, 9 i EU og 4 i Storbritannien. Målt på hvor forretningskritiske de er,
+ligger 6 af de 8 mest kritiske tjenester hos amerikanske leverandører.
+
+Ca. 78 procent af vores samlede datamængde ligger hos to leverandører.
+Sagsbehandlingssystemet og mailplatformen står alene for det meste af det.
+
+Kortlægningen viste også, at vi ikke har afprøvet en exitplan for nogen af
+de tre mest kritiske tjenester. Kontrakterne indeholder formuleringer om
+dataudtræk, men formatet er ikke specificeret, og ingen har testet at det
+udtræk rent faktisk kan indlæses et andet sted.
+
+Søren Balle vurderede, at et skifte af mailplatform alene ville koste
+i størrelsesordenen 4,5 mio. kr. over to år, hvoraf det meste er interne
+timer og ikke licenser.
+
+
+3. DET REGULATORISKE BILLEDE I EU
+
+Mette Iversen gennemgik de rammer, der har betydning for os.
+
+GDPR og tredjelandsoverførsler: efter Schrems II-dommen i 2020 hviler
+overførsler til USA nu på EU-US Data Privacy Framework fra 2023. Rammen
+fungerer, men er under retlig prøvelse, og Mette Iversen understregede, at
+vi bør planlægge ud fra, at den kan blive udfordret igen.
+
+Data Act: reglerne om skift af cloudleverandør har været i anvendelse siden
+efteråret 2025. De pålægger leverandører at gøre det lettere at flytte data
+og udfaser gradvist gebyrer for at skifte. Det forbedrer vores forhandlings-
+position, men fjerner ikke den tekniske indlåsning.
+
+NIS2: kravene til risikostyring og leverandørkæde rammer os som
+samfundsvigtig aktør. Dokumentationskravet betyder i praksis, at
+kortlægningen fra punkt 2 skal vedligeholdes løbende, ikke laves én gang.
+
+Certificering af cloudtjenester på EU-niveau er fortsat under forhandling,
+og netop spørgsmålet om suverænitetskrav er det, der trækker ud. Yasmin
+Haddad advarede mod at lægge planer, der forudsætter, at den ordning
+lander på en bestemt måde.
+
+
+4. TRE SCENARIER FOR DE NÆSTE TRE ÅR
+
+Yasmin Haddad præsenterede tre veje, bevidst stillet skarpt op:
+
+Scenarie A — bliv, men bliv klogere.
+Vi fortsætter med de nuværende leverandører, men stiller skarpere krav i
+kontrakterne, tester exitplaner årligt og bruger de nye regler til at
+forhandle. Lav omkostning, lav ændring, men afhængigheden består.
+
+Scenarie B — flyt det kritiske.
+Vi flytter de tjenester, der behandler medlemsdata, til europæisk hostede
+løsninger, og lader resten blive. Middel omkostning. Kræver at vi kan finde
+alternativer, der reelt kan det samme.
+
+Scenarie C — europæisk som udgangspunkt.
+Alle nye indkøb skal som udgangspunkt være europæisk hostede og helst
+baseret på åbne standarder. Eksisterende tjenester udfases over fem til
+syv år. Høj omkostning, høj kompleksitet, størst uafhængighed.
+
+
+5. INDVENDINGER OG RISICI
+
+Der var reel uenighed i gruppen, og formanden bad om at den blev
+protokolleret.
+
+Peter Krogh advarede mod at forveksle "europæisk hostet" med "uafhængig".
+Flere europæiske udbydere kører oven på amerikansk teknologi, og et
+datacenter i Frankfurt ændrer ikke ved, hvem der ejer softwarelaget.
+
+Søren Balle pegede på, at markedet for alternativer er umodent på netop de
+områder, hvor vi er mest afhængige, og at vi risikerer at bytte én
+afhængighed ud med en mindre leverandør med større driftsrisiko.
+
+Mette Iversen fremhævede omvendt, at det ikke kun er et spørgsmål om jura
+og drift. Hvis medlemmerne ikke har tillid til, hvor deres oplysninger
+ligger, er det i sig selv et problem for os.
+
+Hanne Lund konkluderede, at gruppen ikke er uenig om målet, men om tempoet
+og om hvor meget vi skal betale for uafhængighed nu frem for senere.
+
+
+6. BESLUTNINGER OG OPFØLGNING
+
+Beslutning 1: Arbejdsgruppen anbefaler scenarie B som udgangspunkt, med
+det forbehold at anbefalingen skal genbesøges, når certificeringsordningen
+på EU-niveau er afklaret.
+
+Beslutning 2: Der udarbejdes og afprøves en exitplan for de tre mest
+kritiske tjenester. Planen skal testes med et reelt dataudtræk, ikke kun
+beskrives på papir.
+
+Beslutning 3: Kortlægningen af leverandører gøres til en fast årlig øvelse
+og lægges ind under den eksisterende risikostyring.
+
+Beslutning 4: Alle nye indkøb over 250.000 kr. skal fra 1. juli 2026
+ledsages af en vurdering af exitomkostning og dataplacering.
+
+Opfølgning:
+- Peter Krogh udarbejder udkast til exitplan. Frist 20. juni 2026.
+- Søren Balle indhenter tilbud på to europæiske alternativer til
+  sagsbehandlingssystemet. Frist 15. august 2026.
+- Mette Iversen opdaterer fortegnelsen over tredjelandsoverførsler.
+  Frist 1. juli 2026.
+- Yasmin Haddad forbereder oplæg til direktionen. Frist 1. september 2026.
+
+
+NÆSTE MØDE
+
+Torsdag den 27. august 2026 kl. 13.00. Hovedpunkt: gennemgang af den
+afprøvede exitplan og de indhentede tilbud.
+
+Spørgsmål til referatet: digitalisering@aka.dk

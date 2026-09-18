@@ -1,0 +1,1022 @@
+/* ==========================================================================
+   AKA Assistent — stilark
+
+   Alt visuelt styres af variablerne i :root. Vil man skifte udtryk, er det
+   dem man rører — resten af filen læser kun fra dem.
+   ========================================================================== */
+
+/* --- 1. Farver og mål ---------------------------------------------------- */
+
+:root {
+  /* Farverne er hentet fra aka.dk og stemmer med PowerPoint-skabelonens
+     tema. Mørk lilla er tekstfarven — ikke sort. Mint bruges sparsomt. */
+  --bg:            #f6f6f6;   /* sidens baggrund på aka.dk */
+  --surface:       #ffffff;
+  --surface-2:     #efeef4;
+  --surface-3:     #e4e1ee;
+  --line:          #e2e0ea;
+  --line-stærk:    #cdc8dc;
+
+  --tekst:         #2e1760;   /* AKA's mørke lilla */
+  --tekst-dæmpet:  #635a7d;
+  --tekst-svag:    #736b8b;   /* 4,6:1 — holder til 11px-etiketter */
+
+  --accent:        #5f30c5;   /* knapfarven på aka.dk */
+  --accent-hover:  #4c1ce0;
+  --accent-tone:   #efeafc;
+  --accent-tekst:  #ffffff;
+  --mint:          #00ffcc;   /* accent — kun i små doser */
+
+  --advarsel:      #8a5a00;
+  --advarsel-tone: #fdf3e0;
+  --advarsel-linje:#e8d5a8;
+
+  --fejl:          #a3282b;
+  --fejl-tone:     #fbecec;
+
+  --r-sm: 8px;
+  --r:    12px;
+  --r-lg: 18px;
+  --r-rund: 999px;
+  --r-knap: 999px;            /* aka.dk bruger 35px — altså pilleform */
+
+  --skygge-lav:  0 1px 2px rgba(46,23,96,.06);
+  --skygge:      0 2px 8px rgba(46,23,96,.08), 0 1px 2px rgba(46,23,96,.05);
+  --skygge-høj:  0 12px 32px rgba(46,23,96,.18);
+
+  --sidebar-bredde: 264px;
+  --spalte: 46rem;          /* læsbar tekstbredde i samtalen */
+
+  /* aka.dk bruger Apercu, som er en licenseret skrift vi ikke må levere.
+     Har I licensen, så læg filerne i static/skrifter/ og fjern
+     kommentaren fra @font-face nedenfor — så bruges den automatisk.
+     Ellers falder vi tilbage på systemets egen grotesk, som ligger tæt. */
+  --skrift: Apercu, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+            "Helvetica Neue", Arial, sans-serif;
+  --skrift-kode: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+                 "Liberation Mono", monospace;
+}
+
+/*
+@font-face {
+  font-family: "Apercu";
+  src: url("/static/skrifter/apercu-regular.woff2") format("woff2");
+  font-weight: 400; font-display: swap;
+}
+@font-face {
+  font-family: "Apercu";
+  src: url("/static/skrifter/apercu-medium.woff2") format("woff2");
+  font-weight: 500; font-display: swap;
+}
+*/
+
+:root[data-tema="moerk"] {
+  /* aka.dk har ingen mørk tilstand, så den er udledt: samme lilla, vendt
+     om. Baggrunden er lilla-tonet frem for neutralt grå, så det stadig
+     føles som AKA. */
+  --bg:            #17102b;
+  --surface:       #1f1738;
+  --surface-2:     #291f47;
+  --surface-3:     #342957;
+  --line:          #372c5c;
+  --line-stærk:    #4a3d75;
+
+  --tekst:         #ede9f8;
+  --tekst-dæmpet:  #a79dc4;
+  --tekst-svag:    #8b82a8;
+
+  --accent:        #bea1f5;   /* AKA's lyse lilla bærer kontrasten her */
+  --accent-hover:  #d3befa;
+  --accent-tone:   #2d2150;
+  --accent-tekst:  #2e1760;
+  --mint:          #00ffcc;
+
+  --advarsel:      #e0b569;
+  --advarsel-tone: #33291a;
+  --advarsel-linje:#4d3f26;
+
+  --fejl:          #ef8a85;
+  --fejl-tone:     #382322;
+
+  --skygge-lav:  0 1px 2px rgba(0,0,0,.35);
+  --skygge:      0 2px 8px rgba(0,0,0,.4), 0 1px 2px rgba(0,0,0,.3);
+  --skygge-høj:  0 12px 32px rgba(0,0,0,.55);
+}
+
+/* --- 2. Grundlag --------------------------------------------------------- */
+
+* { box-sizing: border-box; }
+
+/* Elementer med display: flex ignorerer ellers hidden-attributten. */
+[hidden] { display: none !important; }
+
+html, body { height: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--tekst);
+  font: 15px/1.6 var(--skrift);
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior: none;
+}
+
+button, input, textarea, select { font: inherit; color: inherit; }
+
+/* Én synlig fokusmarkering overalt — også for dem der bruger tastatur. */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--r-sm);
+}
+:focus:not(:focus-visible) { outline: none; }
+
+.visuelt-skjult {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+/* --- 3. Ikonknapper ------------------------------------------------------ */
+/* Ikonerne tegnes af app.js ud fra data-ikon, så markup'en forbliver ren. */
+
+.ikon {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 34px; height: 34px; flex: none;
+  border: none; background: none; color: var(--tekst-dæmpet);
+  border-radius: 50%; cursor: pointer;   /* runde som på aka.dk */
+  transition: background .15s, color .15s;
+}
+.ikon:hover { background: var(--surface-2); color: var(--tekst); }
+.ikon:disabled { opacity: .4; cursor: default; }
+.ikon:disabled:hover { background: none; color: var(--tekst-dæmpet); }
+.ikon svg { width: 18px; height: 18px; }
+
+/* --- 4. Rammen ----------------------------------------------------------- */
+
+.app { display: flex; height: 100dvh; overflow: hidden; }
+
+.main {
+  flex: 1; min-width: 0;
+  display: flex; flex-direction: column;
+  position: relative;
+}
+
+/* --- 5. Sidebar ---------------------------------------------------------- */
+
+.sidebar {
+  width: var(--sidebar-bredde); flex: none;
+  display: flex; flex-direction: column;
+  background: var(--surface-2);
+  border-right: 1px solid var(--line);
+  transition: margin-left .22s ease;
+}
+/* Bred skærm: fremme som udgangspunkt, væk når brugeren skjuler den.
+   Smal skærm (se nederst): omvendt. CSS bestemmer starttilstanden, så den
+   ikke afhænger af en måling i JavaScript når siden lige er loadet. */
+.app.skjult .sidebar { margin-left: calc(var(--sidebar-bredde) * -1); }
+
+.sidebar-top {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 12px 10px 16px;
+}
+.brand { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1; }
+.mark {
+  width: 30px; height: 30px; flex: none;
+  border-radius: 50%;
+  background: var(--accent); color: var(--accent-tekst);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 650; font-size: 15px;
+}
+.brand-tekst { min-width: 0; line-height: 1.25; }
+.brand-tekst b { display: block; font-size: 14px; font-weight: 620; }
+.brand-tekst span { font-size: 12px; color: var(--tekst-dæmpet); }
+
+.ny-chat {
+  display: flex; align-items: center; gap: 8px;
+  margin: 4px 12px 12px;
+  padding: 9px 16px;
+  border: 1px solid var(--line-stærk); border-radius: var(--r-knap);
+  background: var(--surface); color: var(--tekst);
+  font-size: 14px; font-weight: 550; cursor: pointer;
+  box-shadow: var(--skygge-lav);
+  transition: border-color .15s, color .15s;
+}
+.ny-chat:hover { border-color: var(--accent); color: var(--accent); }
+.ny-chat svg { width: 16px; height: 16px; }
+
+.chats {
+  flex: 1; overflow-y: auto;
+  padding: 0 8px 12px;
+  display: flex; flex-direction: column; gap: 1px;
+}
+.chats-gruppe {
+  font-size: 11px; font-weight: 620; letter-spacing: .04em;
+  text-transform: uppercase; color: var(--tekst-svag);
+  padding: 14px 8px 5px;
+}
+.chat-rk {
+  display: flex; align-items: center; gap: 4px;
+  border-radius: var(--r-sm);
+}
+.chat-rk:hover { background: var(--surface-3); }
+.chat-rk.aktiv { background: var(--accent-tone); }
+.chat-rk.aktiv .chat-navn { color: var(--accent); font-weight: 560; }
+
+.chat-navn {
+  flex: 1; min-width: 0;
+  padding: 8px 4px 8px 8px;
+  border: none; background: none; text-align: left;
+  font-size: 13.5px; color: var(--tekst);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  cursor: pointer;
+}
+.chat-slet {
+  width: 26px; height: 26px; margin-right: 5px;
+  opacity: 0; transition: opacity .15s;
+}
+.chat-rk:hover .chat-slet,
+.chat-slet:focus-visible { opacity: 1; }
+.chat-slet svg { width: 14px; height: 14px; }
+.chat-slet:hover { color: var(--fejl); background: var(--fejl-tone); }
+
+.tom-liste {
+  padding: 10px 8px; font-size: 13px; color: var(--tekst-svag);
+}
+
+.sidebar-fod {
+  margin: 0; padding: 12px 16px 16px;
+  border-top: 1px solid var(--line);
+  font-size: 11.5px; line-height: 1.45; color: var(--tekst-svag);
+}
+
+.skygge-lag {
+  position: fixed; inset: 0; z-index: 40;
+  background: rgba(0,0,0,.35);
+}
+
+/* --- 6. Header ----------------------------------------------------------- */
+
+header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+  background: color-mix(in srgb, var(--bg) 85%, transparent);
+  backdrop-filter: saturate(1.4) blur(8px);
+  position: sticky; top: 0; z-index: 10;
+}
+.chat-titel {
+  flex: 1; min-width: 0; margin: 0;
+  font-size: 14.5px; font-weight: 560;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.header-hoejre { display: flex; align-items: center; gap: 6px; }
+
+.vaelger { position: relative; display: flex; align-items: center; }
+.vaelger select {
+  appearance: none; -webkit-appearance: none;
+  padding: 7px 30px 7px 11px;
+  border: 1px solid var(--line-stærk); border-radius: var(--r-sm);
+  background: var(--surface); color: var(--tekst);
+  font-size: 13.5px; cursor: pointer;
+  max-width: 190px; text-overflow: ellipsis;
+}
+.vaelger select:hover { border-color: var(--accent); }
+.vaelger > span {
+  position: absolute; right: 9px; display: flex;
+  pointer-events: none; color: var(--tekst-dæmpet);
+}
+.vaelger svg { width: 14px; height: 14px; }
+
+.kun-lille { display: none; }
+
+/* --- 7. Samtalen --------------------------------------------------------- */
+
+.log {
+  flex: 1; overflow-y: auto;
+  padding: 28px 20px 8px;
+  scroll-behavior: smooth;
+}
+@media (prefers-reduced-motion: reduce) { .log { scroll-behavior: auto; } }
+
+.raekke {
+  max-width: var(--spalte); margin: 0 auto 26px;
+  display: flex; flex-direction: column;
+}
+.raekke.bruger { align-items: flex-end; }
+
+/* Brugeren får en boble. Assistenten får ren tekst — det læser bedre når
+   svaret fylder en halv side. */
+.bruger .boble {
+  max-width: 88%;
+  padding: 10px 15px;
+  border-radius: var(--r-lg) var(--r-lg) 4px var(--r-lg);
+  background: var(--accent-tone);
+  white-space: pre-wrap; overflow-wrap: anywhere;
+}
+:root[data-tema="moerk"] .bruger .boble { color: var(--tekst); }
+
+.svar-hoved {
+  display: flex; align-items: center; gap: 7px;
+  margin-bottom: 7px;
+  font-size: 12px; color: var(--tekst-dæmpet);
+}
+.svar-prik {
+  width: 17px; height: 17px; border-radius: 5px;
+  background: var(--accent); color: var(--accent-tekst);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700;
+}
+
+.filmaerke {
+  display: inline-flex; align-items: center; gap: 6px;
+  margin-bottom: 6px; padding: 4px 9px;
+  border: 1px solid var(--line); border-radius: var(--r-rund);
+  background: var(--surface);
+  font-size: 12px; color: var(--tekst-dæmpet);
+}
+.filmaerke svg { width: 12px; height: 12px; }
+
+.handlinger {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 4px;
+  margin-top: 8px; min-height: 28px;
+}
+.handling {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 12px;
+  border: 1px solid transparent; border-radius: var(--r-knap);
+  background: none; color: var(--tekst-svag);
+  font-size: 12.5px; cursor: pointer;
+  transition: color .15s, border-color .15s, background .15s;
+}
+.handling:hover:not(:disabled) {
+  color: var(--accent); border-color: var(--line); background: var(--surface);
+}
+.handling:disabled { opacity: .55; cursor: default; }
+/* Knapperne må gerne ombryde som hele knapper — ikke midt i teksten. */
+.handling { white-space: nowrap; }
+.handling svg { width: 14px; height: 14px; }
+.handling-fejl { font-size: 12.5px; color: var(--fejl); }
+
+/* Blinkende markør mens svaret strømmer ind. */
+.markoer {
+  display: inline-block; width: 7px; height: 1em;
+  margin-left: 2px; vertical-align: -2px;
+  background: var(--accent); border-radius: 1px;
+  animation: blink 1.05s steps(2, start) infinite;
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+.besked-fejl {
+  max-width: var(--spalte); margin: 0 auto 26px;
+  padding: 11px 14px;
+  border: 1px solid var(--fejl); border-radius: var(--r);
+  background: var(--fejl-tone); color: var(--fejl);
+  font-size: 13.5px;
+}
+
+/* --- 8. Markdown i svarene ----------------------------------------------- */
+
+.md { overflow-wrap: anywhere; }
+.md > *:first-child { margin-top: 0; }
+.md > *:last-child { margin-bottom: 0; }
+.md p { margin: 0 0 .85em; }
+.md h1, .md h2, .md h3 {
+  margin: 1.4em 0 .5em; line-height: 1.3; font-weight: 500;
+}
+.md h1 { font-size: 1.28em; }
+.md h2 { font-size: 1.15em; }
+.md h3 { font-size: 1.02em; }
+.md ul, .md ol { margin: 0 0 .85em; padding-left: 1.4em; }
+.md li { margin: .22em 0; }
+.md li > ul, .md li > ol { margin: .22em 0; }
+.md a { color: var(--accent); text-underline-offset: 2px; }
+.md strong { font-weight: 650; }
+.md hr { border: none; border-top: 1px solid var(--line); margin: 1.4em 0; }
+.md blockquote {
+  margin: 0 0 .85em; padding: .1em 0 .1em 1em;
+  border-left: 3px solid var(--line-stærk); color: var(--tekst-dæmpet);
+}
+.md code {
+  padding: .13em .38em;
+  border-radius: 5px; background: var(--surface-2);
+  font: 88%/1.5 var(--skrift-kode);
+}
+.md pre {
+  margin: 0 0 .85em; padding: 12px 14px;
+  border: 1px solid var(--line); border-radius: var(--r);
+  background: var(--surface-2); overflow-x: auto;
+}
+.md pre code { padding: 0; background: none; font-size: 13px; }
+
+/* Kodeblok med bjælke: rammen flytter ud på indpakningen, så bjælken og
+   koden deler kant. */
+.md .kodeblok {
+  margin: 0 0 .85em;
+  border: 1px solid var(--line); border-radius: var(--r);
+  background: var(--surface-2);
+  overflow: hidden;
+}
+.md .kodeblok pre {
+  margin: 0; border: none; border-radius: 0; background: none;
+}
+.kode-top {
+  display: flex; align-items: center; gap: 8px;
+  padding: 5px 6px 5px 13px;
+  border-bottom: 1px solid var(--line);
+}
+.kode-top > span {
+  flex: 1; min-width: 0;
+  font: 11.5px/1 var(--skrift-kode); color: var(--tekst-svag);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.kode-kopi {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 11px;
+  border: 1px solid transparent; border-radius: var(--r-knap);
+  background: none; color: var(--tekst-svag);
+  font-size: 12px; cursor: pointer;
+  transition: color .15s, border-color .15s, background .15s;
+}
+.kode-kopi:hover {
+  color: var(--accent); border-color: var(--line-stærk);
+  background: var(--surface);
+}
+.kode-kopi svg { width: 13px; height: 13px; }
+.md table {
+  width: 100%; margin: 0 0 .85em;
+  border-collapse: collapse; font-size: 14px; display: block;
+  overflow-x: auto;
+}
+.md th, .md td {
+  padding: 7px 11px; border: 1px solid var(--line); text-align: left;
+}
+.md th { background: var(--surface-2); font-weight: 620; }
+
+/* Genereret billede i et svar. */
+.billede { margin: 0; }
+.billede img {
+  display: block; max-width: 100%; height: auto;
+  border: 1px solid var(--line); border-radius: var(--r);
+  background: var(--surface-2);
+}
+.billede figcaption {
+  margin-top: 7px;
+  font-size: 12.5px; line-height: 1.5; color: var(--tekst-dæmpet);
+}
+.billede-prompt {
+  margin-top: 3px;
+  font: 11.5px/1.5 var(--skrift-kode); color: var(--tekst-svag);
+}
+.billede-note {
+  margin-top: 5px;
+  font-size: 12px; line-height: 1.5; color: var(--advarsel);
+}
+
+/* --- 9. Tom tilstand ----------------------------------------------------- */
+
+.tom {
+  max-width: 62rem; margin: 0 auto;      /* menuen må være bredere end tekst */
+  padding: 4vh 0 0; text-align: center;
+}
+.tom h2 { margin: 0 0 5px; font-size: 23px; font-weight: 500; letter-spacing: -.01em; }
+.tom p { margin: 0 0 20px; color: var(--tekst-dæmpet); }
+/* Opgavebiblioteket.
+
+   Tre ting styrer designet her:
+
+   1. Det er en MENU, ikke brødtekst, så den er ikke låst til tekstspaltens
+      bredde. Den får lov at fylde vinduet ud.
+   2. Grupperne har 4-3-3-2-4 opgaver. To spalter giver kun to huller i
+      gitteret; tre spalter giver fem. Derfor to.
+   3. Brede rækker gør plads til titel og forklaring under hinanden uden at
+      kortet bliver højt — hele oversigten fylder under en skærm. */
+
+.opgaveliste {
+  text-align: left;
+  margin: 4px auto 0;
+  max-width: 62rem;            /* bredere end tekstspalten med vilje */
+}
+.opgavegruppe + .opgavegruppe { margin-top: 13px; }
+.opgavegruppe > h3 {
+  margin: 0 0 6px;
+  font-size: 11.5px; font-weight: 620; letter-spacing: .04em;
+  text-transform: uppercase; color: var(--tekst-svag);
+}
+.opgavegitter {
+  display: grid; gap: 6px;
+  /* 420px sikrer PRÆCIS to spalter i den 62rem brede ramme. Tre spalter
+     ville klippe forklaringerne og give fem huller i stedet for to. */
+  grid-template-columns: repeat(auto-fill, minmax(min(420px, 100%), 1fr));
+}
+.opgavekort {
+  position: relative;
+  display: flex; align-items: center; gap: 11px;
+  padding: 9px 13px; text-align: left;
+  border: 1px solid transparent; border-radius: var(--r);
+  background: var(--surface); color: var(--tekst);
+  box-shadow: 0 1px 2px rgba(46, 23, 96, .04);
+  cursor: pointer;
+  transition: border-color .16s ease, box-shadow .16s ease, transform .16s ease;
+  /* Indtoningen løber ned over siden. backwards holder kortet skjult indtil
+     dets tur — ellers blinker alle 16 frem og forsvinder igen. */
+  animation: opgaveInd .34s cubic-bezier(.2, .7, .3, 1) backwards;
+  animation-delay: calc(var(--nr, 0) * 22ms);
+}
+
+@keyframes opgaveInd {
+  from { opacity: 0; transform: translateY(7px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.opgavekort:hover,
+.opgavekort:focus-visible {
+  border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+  box-shadow: 0 4px 14px rgba(46, 23, 96, .10);
+  transform: translateY(-1px);
+}
+.opgavekort:active { transform: translateY(0); transition-duration: .05s; }
+
+/* Ikonet fyldes op på hover — kortet svarer, uden at noget hopper. */
+.opgaveikon {
+  display: flex; align-items: center; justify-content: center;
+  width: 29px; height: 29px; flex: none;
+  border-radius: 50%;                     /* rund, som resten af AKA */
+  background: var(--accent-tone); color: var(--accent);
+  transition: background .16s ease, color .16s ease;
+}
+.opgaveikon svg { width: 15px; height: 15px; }
+.opgavekort:hover .opgaveikon,
+.opgavekort:focus-visible .opgaveikon {
+  background: var(--accent); color: var(--accent-tekst);
+}
+
+/* Titel og forklaring deler linje. Det halverer rækkehøjden, så hele
+   oversigten kan ses uden at rulle — og forklaringen er stadig der. */
+.opgavetekst {
+  min-width: 0; line-height: 1.4; font-size: 13.5px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.opgavetekst b { font-weight: 550; }
+.opgavetekst span { color: var(--tekst-dæmpet); font-size: 12.5px; }
+.opgavetekst span::before { content: "  ·  "; color: var(--tekst-svag); }
+
+/* Pilen siger "her sker der noget", uden at fylde før man peger. */
+.opgavepil {
+  display: flex; margin-left: auto; padding-left: 8px;
+  color: var(--accent);
+  opacity: 0; transform: translateX(-5px);
+  transition: opacity .16s ease, transform .16s ease;
+}
+.opgavepil svg { width: 15px; height: 15px; }
+.opgavekort:hover .opgavepil,
+.opgavekort:focus-visible .opgavepil { opacity: 1; transform: none; }
+
+/* Under 620px er der ikke plads til begge dele på én linje. */
+@media (max-width: 620px) {
+  .opgavetekst { white-space: normal; }
+  .opgavetekst b, .opgavetekst span { display: block; }
+  .opgavetekst span::before { content: none; }
+}
+
+/* Dialogen: to spalter, samme grund som på tom-skærmen — tre ville klippe
+   forklaringerne. Og den må kun være så høj som indholdet kræver, i
+   modsætning til indstillingssiden der altid har meget at vise. */
+.ark .opgaveliste { max-width: none; }
+.ark .opgavegitter { grid-template-columns: repeat(auto-fill, minmax(min(390px, 100%), 1fr)); }
+/* Dialogen ligger i .main, som er en flex-kolonne — uden align-self bliver
+   den strakt til fuld højde og står med en tom bund under indholdet. */
+#opgaveark { height: auto; align-self: center; width: min(1010px, 95vw); }
+/* flex: 1 ville få kroppen til at fylde hele den tilladte højde ud og
+   efterlade en tom bund. 0 1 auto lader den være sit indhold — men stadig
+   skrumpe og rulle, hvis der bliver flere opgaver end der er plads til. */
+#opgaveark .ark-krop { flex: 0 1 auto; padding-bottom: 22px; }
+
+/* Vinket i samtalen når rollen skiftes. */
+.rolleskift {
+  display: flex; align-items: center; gap: 8px;
+  max-width: var(--spalte); margin: 0 auto 22px;
+  padding: 8px 12px;
+  border: 1px dashed var(--line-stærk); border-radius: var(--r);
+  font-size: 12.5px; color: var(--tekst-dæmpet);
+}
+.rolleskift svg { width: 14px; height: 14px; flex: none; color: var(--accent); }
+
+/* --- 10. Composer -------------------------------------------------------- */
+
+footer { padding: 0 20px 14px; }
+
+.composer {
+  max-width: var(--spalte); margin: 0 auto;
+  border: 1px solid var(--line-stærk); border-radius: var(--r-lg);
+  background: var(--surface);
+  box-shadow: var(--skygge);
+  transition: border-color .15s, box-shadow .15s;
+}
+.composer:focus-within {
+  border-color: var(--accent);
+  box-shadow: var(--skygge), 0 0 0 3px var(--accent-tone);
+}
+.composer-raekke {
+  display: flex; align-items: flex-end; gap: 6px; padding: 7px;
+}
+
+/* Rolle og opgaver sidder over skrivefeltet — begge hører til samtalen,
+   ikke til den enkelte besked. */
+.composer-top {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 9px 0;
+}
+.composer-top .vaelger { flex: 1; min-width: 0; }
+.vaelger.lille select {
+  width: 100%; max-width: 230px;
+  padding: 5px 26px 5px 9px;
+  font-size: 12.5px; color: var(--tekst-dæmpet);
+  border-color: var(--line);
+}
+.vaelger.lille select:hover { color: var(--accent); }
+.vaelger.lille + .opgaveknap { flex: none; }
+.opgaveknap {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 13px;
+  border: 1px solid var(--line); border-radius: var(--r-knap);
+  background: var(--surface); color: var(--tekst-dæmpet);
+  font-size: 12.5px; cursor: pointer;
+  transition: border-color .15s, color .15s;
+}
+.opgaveknap:hover { border-color: var(--accent); color: var(--accent); }
+.opgaveknap svg { width: 14px; height: 14px; }
+
+/* Skrivefeltet og fremhævningslaget ligger oven på hinanden og SKAL have
+   nøjagtig samme typografi og indpakning, ellers glider markeringerne. */
+.felt { position: relative; flex: 1; min-width: 0; }
+.felt textarea,
+.spejl {
+  width: 100%;
+  margin: 0; padding: 8px 4px;
+  border: none;
+  font: 15px/1.6 var(--skrift);
+  white-space: pre-wrap; overflow-wrap: break-word; word-break: normal;
+}
+.felt textarea {
+  display: block; position: relative; z-index: 1;
+  max-height: 220px; resize: none; background: transparent;
+  outline: none;
+}
+.felt textarea::placeholder { color: var(--tekst-svag); }
+.spejl {
+  position: absolute; inset: 0; z-index: 0;
+  overflow: hidden; pointer-events: none;
+  color: transparent;
+}
+.spejl mark {
+  background: var(--advarsel-tone);
+  color: transparent;
+  border-bottom: 2px solid var(--advarsel);
+  border-radius: 3px;
+}
+
+.send {
+  width: 34px; height: 34px; flex: none;
+  display: flex; align-items: center; justify-content: center;
+  border: none; border-radius: 50%;
+  background: var(--accent); color: var(--accent-tekst);
+  cursor: pointer; transition: background .15s, opacity .15s;
+}
+.send:hover:not(:disabled) { background: var(--accent-hover); }
+.send:disabled { opacity: .4; cursor: default; }
+.send svg { width: 17px; height: 17px; }
+
+.ansvar {
+  max-width: var(--spalte); margin: 8px auto 0;
+  text-align: center; font-size: 11.5px; color: var(--tekst-svag);
+}
+
+/* Vedhæftet fil */
+.vedhaeft:not(:empty) { padding: 9px 10px 0; }
+.chip {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 8px 6px 11px;
+  border-radius: var(--r-sm);
+  background: var(--accent-tone); color: var(--accent);
+  font-size: 13px;
+}
+.chip svg { width: 13px; height: 13px; }
+.chip .note { color: var(--tekst-dæmpet); }
+.chip.daarlig { background: var(--fejl-tone); color: var(--fejl); }
+.chip .x {
+  display: flex; border: none; background: none; color: inherit;
+  padding: 2px; border-radius: 4px; cursor: pointer; opacity: .7;
+}
+.chip .x:hover { opacity: 1; }
+.chip .x svg { width: 12px; height: 12px; }
+
+/* --- 11. PII-advarsel ---------------------------------------------------- */
+
+.pii {
+  margin: 9px 9px 0;
+  padding: 12px 14px;
+  border: 1px solid var(--advarsel-linje); border-radius: var(--r);
+  background: var(--advarsel-tone);
+  font-size: 13.5px;
+}
+.pii-top { display: flex; align-items: flex-start; gap: 9px; }
+.pii-top svg { width: 16px; height: 16px; flex: none; margin-top: 2px; color: var(--advarsel); }
+.pii-titel { font-weight: 600; color: var(--tekst); }
+
+.pii-fund { margin: 7px 0 0; padding: 0; list-style: none; }
+.pii-fund li {
+  display: flex; align-items: baseline; gap: 8px;
+  padding: 2px 0; color: var(--tekst-dæmpet); font-size: 13px;
+}
+.pii-fund .hvad { color: var(--tekst); font-weight: 550; }
+.pii-fund .hvad::after { content: ":"; }
+/* Den lette variant: vink alene, som ikke blokerer. */
+.pii.let {
+  background: var(--surface-2); border-color: var(--line);
+}
+.pii.let .pii-top svg { color: var(--tekst-dæmpet); }
+.pii.let .pii-note { border-top-color: var(--line); }
+.pii-fund .vink-ord { color: var(--tekst-dæmpet); font-size: 12.5px; }
+.pii-fund code {
+  font: 12.5px/1.4 var(--skrift-kode);
+  padding: 1px 5px; border-radius: 4px;
+  background: var(--surface); color: var(--tekst);
+}
+
+.pii-valg { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 11px; }
+.pii-valg button {
+  padding: 6px 14px;
+  border: 1px solid var(--advarsel-linje); border-radius: var(--r-knap);
+  background: var(--surface); color: var(--tekst);
+  font-size: 13px; cursor: pointer;
+  transition: border-color .15s, background .15s;
+}
+.pii-valg button:hover { border-color: var(--advarsel); }
+.pii-valg .primaer {
+  background: var(--accent); color: var(--accent-tekst);
+  border-color: var(--accent);
+}
+.pii-valg .primaer:hover { background: var(--accent-hover); }
+
+.pii-note {
+  margin: 11px 0 0; padding-top: 10px;
+  border-top: 1px solid var(--advarsel-linje);
+  font-size: 12px; line-height: 1.5; color: var(--tekst-dæmpet);
+}
+
+/* Lille markering i headeren når filteret er slået fra for chatten. */
+.pii-fra {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 9px; border-radius: var(--r-rund);
+  border: 1px solid var(--line);
+  font-size: 12px; color: var(--tekst-dæmpet);
+  background: none; cursor: pointer;
+}
+.pii-fra:hover { border-color: var(--accent); color: var(--accent); }
+.pii-fra svg { width: 13px; height: 13px; }
+
+/* --- 11b. Indstillinger (administratorsiden) ----------------------------- */
+
+.ark {
+  /* Både bredde og højde sættes eksplicit. Med kun max-height falder
+     dialogen sammen om sit indhold, og så bliver rullefeltet unødigt lavt. */
+  width: min(900px, 95vw);
+  height: min(880px, 92vh);
+  max-width: 95vw; max-height: 92vh;
+  padding: 0;
+  border: 1px solid var(--line); border-radius: var(--r-lg);
+  background: var(--surface); color: var(--tekst);
+  box-shadow: var(--skygge-høj);
+  overflow: hidden;
+}
+.ark::backdrop { background: rgba(0,0,0,.4); }
+.ark[open] { display: flex; flex-direction: column; }
+
+.ark-top {
+  display: flex; align-items: center; gap: 12px;
+  padding: 15px 14px 15px 20px;
+  border-bottom: 1px solid var(--line);
+}
+.ark-top h2 { flex: 1; margin: 0; font-size: 17px; font-weight: 500; }
+
+.ark-krop { flex: 1; overflow-y: auto; padding: 4px 20px 20px; }
+
+.ark-fod {
+  display: flex; align-items: center; gap: 9px;
+  padding: 13px 16px; border-top: 1px solid var(--line);
+  background: var(--surface-2);
+}
+.ark-status { flex: 1; font-size: 12.5px; color: var(--tekst-dæmpet); }
+.ark-knap {
+  padding: 8px 17px;
+  border: 1px solid var(--line-stærk); border-radius: var(--r-knap);
+  background: var(--surface); color: var(--tekst);
+  font-size: 13.5px; cursor: pointer;
+}
+.ark-knap:hover { border-color: var(--accent); color: var(--accent); }
+.ark-knap.primaer {
+  background: var(--accent); color: var(--accent-tekst); border-color: var(--accent);
+}
+.ark-knap.primaer:hover { background: var(--accent-hover); color: var(--accent-tekst); }
+
+.ark-afsnit { padding: 20px 0 4px; border-top: 1px solid var(--line); }
+.ark-afsnit:first-child { border-top: none; }
+.ark-afsnit > h3 { margin: 0 0 4px; font-size: 14px; font-weight: 620; }
+.ark-hjaelp { margin: 0 0 12px; font-size: 12.5px; line-height: 1.55; color: var(--tekst-dæmpet); }
+
+.ark-felt { margin-bottom: 14px; }
+.ark-felt label { display: block; margin-bottom: 5px; font-size: 13px; font-weight: 550; }
+.ark-felt textarea,
+.ark-felt input[type=number],
+.ark-felt select {
+  width: 100%; padding: 9px 11px;
+  border: 1px solid var(--line-stærk); border-radius: var(--r-sm);
+  background: var(--canvas, var(--bg)); color: var(--tekst);
+  font: 14px/1.6 var(--skrift);
+}
+.ark-felt textarea { min-height: 96px; resize: vertical; font-size: 13.5px; }
+.ark-felt input[type=number] { width: 140px; }
+.ark-felt .note { margin-top: 5px; font-size: 12px; color: var(--tekst-svag); }
+
+.ark-tjek {
+  display: flex; align-items: flex-start; gap: 9px;
+  padding: 7px 0; font-size: 13.5px;
+}
+.ark-tjek input { margin: 3px 0 0; flex: none; width: 15px; height: 15px; accent-color: var(--accent); }
+.ark-tjek .hvad { display: block; }
+.ark-tjek .hvorfor { display: block; font-size: 12px; color: var(--tekst-svag); }
+
+.ark-liste { border: 1px solid var(--line); border-radius: var(--r); padding: 4px 12px 10px; }
+.ark-liste + .ark-liste { margin-top: 10px; }
+.ark-liste > h4 {
+  margin: 10px 0 2px; font-size: 12px; font-weight: 620;
+  letter-spacing: .03em; text-transform: uppercase; color: var(--tekst-svag);
+}
+/* Mønstrene fylder mindre i to spalter, så man ser hele filteret på én gang. */
+.ark-liste.spalter { display: grid; grid-template-columns: 1fr 1fr; column-gap: 18px; }
+.ark-liste.spalter > h4 { grid-column: 1 / -1; }
+@media (max-width: 620px) {
+  .ark-liste.spalter { grid-template-columns: 1fr; }
+}
+
+.ark-status-linje {
+  display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px;
+}
+.ark-mærke {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 10px; border-radius: var(--r-rund);
+  border: 1px solid var(--line); font-size: 12.5px; color: var(--tekst-dæmpet);
+}
+.ark-mærke::before {
+  content: ""; width: 7px; height: 7px; border-radius: 50%;
+  background: var(--tekst-svag);
+}
+.ark-mærke.til::before { background: var(--accent); }
+
+/* --- 12. Løsdele --------------------------------------------------------- */
+
+.til-bund {
+  position: absolute; left: 50%; bottom: 118px; z-index: 5;
+  transform: translateX(-50%);
+  width: 34px; height: 34px;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid var(--line-stærk); border-radius: var(--r-rund);
+  background: var(--surface); color: var(--tekst-dæmpet);
+  box-shadow: var(--skygge); cursor: pointer;
+}
+.til-bund:hover { color: var(--accent); border-color: var(--accent); }
+.til-bund svg { width: 16px; height: 16px; }
+
+.drop {
+  position: absolute; inset: 0; z-index: 50;
+  display: flex; align-items: center; justify-content: center;
+  padding: 22px;
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  backdrop-filter: blur(3px);
+}
+.drop-kort {
+  display: flex; align-items: center; gap: 11px;
+  padding: 26px 34px;
+  border: 2px dashed var(--accent); border-radius: var(--r-lg);
+  background: var(--surface); color: var(--accent);
+  font-size: 15px; font-weight: 550;
+  box-shadow: var(--skygge-høj);
+}
+.drop-kort svg { width: 20px; height: 20px; }
+
+/* --- 13. Små skærme ------------------------------------------------------ */
+
+@media (max-width: 860px) {
+  .kun-lille { display: inline-flex; }
+
+  /* Skuffe: væk som udgangspunkt, frem når brugeren beder om den. */
+  .sidebar {
+    position: fixed; inset: 0 auto 0 0; z-index: 50;
+    box-shadow: var(--skygge-høj);
+    margin-left: calc(var(--sidebar-bredde) * -1);
+  }
+  .app.aaben .sidebar { margin-left: 0; }
+
+  .log { padding: 20px 16px 8px; }
+  footer { padding: 0 12px 10px; }
+  .raekke { margin-bottom: 22px; }
+  .vaelger select { max-width: 130px; }
+  .til-bund { bottom: 112px; }
+}
+
+@media (max-width: 460px) {
+  .forslag { flex-direction: column; }
+  .forslag button { text-align: center; }
+  .ansvar { font-size: 11px; }
+}
+
+/* Linjen der dukker op når et svar ramte token-loftet. */
+.afkortet {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 9px;
+  max-width: var(--spalte); margin: 10px auto 0;
+  padding: 10px 13px;
+  border: 1px solid var(--advarsel-linje); border-radius: var(--r);
+  background: var(--advarsel-tone);
+  font-size: 13px; color: var(--tekst-dæmpet);
+}
+.afkortet svg { width: 15px; height: 15px; flex: none; color: var(--advarsel); }
+.afkortet span { flex: 1; min-width: 12rem; }
+.afkortet .ark-knap { padding: 6px 12px; font-size: 13px; }
+
+/* Redigerbare poster på administratorsiden (roller, opgaver). */
+.ark-liste .post {
+  border-top: 1px solid var(--line);
+  padding: 2px 0 8px;
+}
+.ark-liste .post:first-of-type { border-top: none; }
+.ark-liste .post > summary {
+  padding: 9px 2px; cursor: pointer;
+  font-size: 13.5px; font-weight: 550;
+  list-style: none;
+}
+.ark-liste .post > summary::-webkit-details-marker { display: none; }
+.ark-liste .post > summary::before {
+  content: "▸"; display: inline-block; width: 16px;
+  color: var(--tekst-svag); transition: transform .12s;
+}
+.ark-liste .post[open] > summary::before { transform: rotate(90deg); }
+.ark-liste .post .ark-felt { margin: 0 0 10px 16px; }
+.ark-liste .post input[type=text],
+.ark-liste .post select,
+.ark-liste .post textarea {
+  width: 100%; padding: 7px 10px;
+  border: 1px solid var(--line); border-radius: var(--r-sm);
+  background: var(--bg); color: var(--tekst);
+  font: 13px/1.55 var(--skrift);
+}
+.ark-liste .post textarea { min-height: 76px; resize: vertical; }
+.ark-liste .post .ark-knap.slet {
+  margin-left: 16px; padding: 5px 11px; font-size: 12.5px;
+  color: var(--fejl); border-color: var(--line);
+}
+.ark-liste .post .ark-knap.slet:hover { border-color: var(--fejl); color: var(--fejl); }
+
+/* Rollevælgeren når den ikke gør noget (billedmodel valgt). */
+.vaelger.slukket select { opacity: .5; cursor: not-allowed; }
+.vaelger.slukket > span { opacity: .4; }
+
+/* --- Startskærmens gruppeniveau ----------------------------------------- */
+/* Gruppekortene er større og luftigere end opgavekortene — de er fem valg,
+   ikke seksten, og må gerne fylde. */
+.opgavegitter.grupper { gap: 8px; }
+.opgavekort.gruppekort { padding: 13px 15px; gap: 13px; }
+.opgavekort.gruppekort .opgaveikon { width: 34px; height: 34px; }
+.opgavekort.gruppekort .opgaveikon svg { width: 17px; height: 17px; }
+.opgavekort.gruppekort .opgavetekst { white-space: normal; }
+.opgavekort.gruppekort .opgavetekst b { display: block; font-size: 14.5px; }
+.opgavekort.gruppekort .opgavetekst span {
+  display: block; margin-top: 1px; font-size: 12px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.opgavekort.gruppekort .opgavetekst span::before { content: none; }
+
+.opgave-tilbage {
+  display: inline-flex; align-items: center; gap: 7px;
+  margin-bottom: 10px; padding: 5px 13px 5px 10px;
+  border: 1px solid var(--line); border-radius: var(--r-knap);
+  background: var(--surface); color: var(--tekst-dæmpet);
+  font-size: 12.5px; cursor: pointer;
+  transition: border-color .15s, color .15s;
+}
+.opgave-tilbage:hover { border-color: var(--accent); color: var(--accent); }
+.opgave-tilbage svg { width: 14px; height: 14px; }
+
+.opgave-gruppetitel {
+  margin: 0 0 8px;
+  font-size: 11.5px; font-weight: 620; letter-spacing: .04em;
+  text-transform: uppercase; color: var(--tekst-svag);
+}

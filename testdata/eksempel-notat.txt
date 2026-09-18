@@ -1,0 +1,69 @@
+INTERNT NOTAT — OMLÆGNING AF SAGSGANGEN FOR FERIEDAGPENGE
+Testdata. Alle navne, numre og tal er opdigtede.
+
+Journalnr.: YDL-2026-0417
+Udarbejdet af: Ydelsesafdelingen
+Dato: 3. august 2026
+
+
+BAGGRUND
+
+Pilotforsøget med den omlagte sagsgang for feriedagpenge kørte i afdelingerne
+i Aalborg og Kolding fra 1. februar til 30. juni 2026. I alt 1.840 sager blev
+behandlet efter den nye model.
+
+Den gennemsnitlige sagsbehandlingstid faldt fra 18 til 11 arbejdsdage.
+Andelen af sager der måtte genoptages på grund af manglende dokumentation
+faldt fra 14 % til 6 %. Til gengæld steg antallet af telefoniske
+henvendelser i den første måned med 22 %, hvilket vurderes at skyldes at
+kvitteringsbrevet var for kortfattet.
+
+
+DEN NYE SAGSGANG
+
+1. Medlemmet søger via selvbetjeningen. Systemet henter selv feriesaldoen
+   fra arbejdsgiverindberetningen, så medlemmet ikke skal indtaste den.
+
+2. Sagen fordeles automatisk til den sagsbehandler der har færrest åbne
+   sager i den pågældende uge.
+
+3. Er dokumentationen komplet, afgøres sagen uden manuel gennemgang.
+   Det gælder ca. 6 ud af 10 sager.
+
+4. Mangler der dokumentation, sendes ét samlet rykkerbrev med en frist på
+   14 dage. Tidligere blev der sendt op til tre særskilte breve.
+
+5. Ved afslag skal begrundelsen henvise til den konkrete bestemmelse.
+   Standardformuleringer uden henvisning godkendes ikke længere.
+
+
+FRISTER OG NÆSTE SKRIDT
+
+Den nye sagsgang rulles ud til alle afdelinger den 1. oktober 2026.
+Sagsbehandlere skal have gennemført e-læringsmodulet senest 15. september.
+Afdelingslederne melder tilbage om bemanding senest 22. august.
+
+Der laves en opfølgende måling efter tre måneder, altså primo januar 2027.
+
+
+ÅBNE PUNKTER
+
+- Kvitteringsbrevet skal omskrives, så det forklarer hvad der sker
+  bagefter. Ansvarlig: kommunikationsteamet.
+- Det er endnu uafklaret hvordan sager med udenlandsk optjening håndteres
+  i den automatiske fordeling.
+- Der mangler en beslutning om hvorvidt den gamle sagsgang skal køre
+  parallelt i en overgangsperiode.
+
+
+SAGSEKSEMPEL
+
+Medlem 010190-1234 fik i pilotforsøget afgjort sin sag på 9 dage mod
+tidligere 21. Medlemmet havde selv uploadet lønsedler, hvilket gjorde
+manuel gennemgang unødvendig.
+
+
+KONTAKT
+
+Spørgsmål til notatet: ydelse@aka.dk
+Vagttelefon i implementeringsperioden: 33 12 44 55

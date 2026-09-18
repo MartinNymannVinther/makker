@@ -1,0 +1,29 @@
+# AKA Assistent — platform-variant.
+# Open WebUI = færdig chatflade. LiteLLM = gateway der oversætter til
+# alle udbydere og logger forbrug. Ingen kode, kun konfiguration.
+services:
+  litellm:
+    image: ghcr.io/berriai/litellm:main-latest
+    command: ["--config", "/app/config.yaml"]
+    volumes:
+      - ./litellm-config.yaml:/app/config.yaml:ro
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - MISTRAL_API_KEY=${MISTRAL_API_KEY}
+    ports:
+      - "4000:4000"
+
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    depends_on: [litellm]
+    environment:
+      # Open WebUI taler med LiteLLM som var det OpenAI.
+      - OPENAI_API_BASE_URL=http://litellm:4000/v1
+      - OPENAI_API_KEY=sk-anything   # LiteLLM styrer de rigtige nøgler
+    volumes:
+      - open-webui:/app/backend/data
+    ports:
+      - "3000:8080"
+
+volumes:
+  open-webui:

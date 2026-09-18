@@ -1,0 +1,17 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Nøgler — kun .env.example må ligge i repoet
+.env
+.env.*
+!.env.example
+
+# Kørselsdata: administratorens ændringer og genererede billeder
+settings.json
+static/genereret/
+
+# Lokalt
+.DS_Store
+.claude/settings.local.json
