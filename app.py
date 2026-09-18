@@ -38,21 +38,28 @@ import settings
 OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://localhost:11434").rstrip("/")
 
 # --- Udbyderne. Samme klasse, forskellig base-URL og nøgle. ----------------
-PROVIDERS = {
-    "claude": OpenAI(
+# En udbyder uden nøgle oprettes slet ikke: SDK'et nægter at starte med en
+# tom nøgle, og så ville appen ikke kunne køre på Ollama alene. Samme
+# princip som med Ollama og fal.ai — er den ikke sat op, findes den ikke.
+PROVIDERS = {}
+
+if os.environ.get("ANTHROPIC_API_KEY"):
+    PROVIDERS["claude"] = OpenAI(
         base_url="https://api.anthropic.com/v1/",
-        api_key=os.environ.get("ANTHROPIC_API_KEY", ""),
-    ),
-    "mistral": OpenAI(
+        api_key=os.environ["ANTHROPIC_API_KEY"],
+    )
+
+if os.environ.get("MISTRAL_API_KEY"):
+    PROVIDERS["mistral"] = OpenAI(
         base_url="https://api.mistral.ai/v1/",
-        api_key=os.environ.get("MISTRAL_API_KEY", ""),
-    ),
-    # Ollama er ligeglad med nøglen, men SDK'et kræver at der står noget.
-    "ollama": OpenAI(
-        base_url=f"{OLLAMA_URL}/v1/",
-        api_key="ollama",
-    ),
-}
+        api_key=os.environ["MISTRAL_API_KEY"],
+    )
+
+# Ollama er ligeglad med nøglen, men SDK'et kræver at der står noget.
+PROVIDERS["ollama"] = OpenAI(
+    base_url=f"{OLLAMA_URL}/v1/",
+    api_key="ollama",
+)
 
 # --- Modeller i skyen. Tilføj/fjern frit. ---------------------------------
 # Nøglen er det navn UI'et sender. Værdien er hvilken udbyder + hvilket
@@ -103,8 +110,13 @@ def billedmodeller():
 
 
 def alle_modeller():
-    """Sky + lokalt + billeder, i den rækkefølge de skal stå i dropdownen."""
-    return {**MODELS, **lokale_modeller(), **billedmodeller()}
+    """Sky + lokalt + billeder, i den rækkefølge de skal stå i dropdownen.
+
+    Skymodeller hvis udbyder ikke har en nøgle, sorteres fra her — så
+    dropdownen kun viser det der faktisk kan svare.
+    """
+    sky = {navn: v for navn, v in MODELS.items() if v["provider"] in PROVIDERS}
+    return {**sky, **lokale_modeller(), **billedmodeller()}
 
 # Systemprompten og de andre knapper administrator kan dreje på ligger i
 # settings.py, ikke som konstanter her. De hentes ved hvert kald, så en
@@ -210,6 +222,9 @@ def find(navn):
     """Modelnavn fra UI'et → posten i modellisten. Falder tilbage til den
     første, så et ukendt navn ikke vælter kaldet."""
     modeller = alle_modeller()
+    if not modeller:
+        raise HTTPException(status_code=503, detail=(
+            "Ingen modeller er sat op. Sæt en nøgle i .env eller start Ollama."))
     return modeller.get(navn) or next(iter(modeller.values()))
 
 
