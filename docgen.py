@@ -164,16 +164,18 @@ def _sidetal(afsnit):
         løb._r.append(element)
 
 
-AKA = Skabelon(
-    navn="AKA",
-    afsender="Akademikernes A-kasse",
-    accent=(0x18, 0x5E, 0x63),   # samme grønne som i chatfladen
-    skrift="Calibri",
+HAIJ = Skabelon(
+    navn="Haij",
+    afsender="Haij",
+    accent=(0x4A, 0x6B, 0x53),   # Haij's mosgrønne — samme som i chatfladen
+    # Archivo er ikke installeret på modtagerens maskine, så vi bruger
+    # Arial, som Archivo alligevel falder tilbage på i webappen.
+    skrift="Arial",
 )
 
 # Flere skabeloner? Én linje her. UI'et behøver ikke vide mere.
-SKABELONER = {"aka": AKA}
-STANDARD = "aka"
+SKABELONER = {"haij": HAIJ}
+STANDARD = "haij"
 
 
 # --- Fra modelsvar til dokument ------------------------------------------
@@ -228,7 +230,7 @@ def læs_svar(rå: str) -> dict:
     }
 
 
-def byg(indhold: dict, skabelon: Skabelon = AKA, dato=None) -> bytes:
+def byg(indhold: dict, skabelon: Skabelon = HAIJ, dato=None) -> bytes:
     """Struktureret indhold ind, færdig .docx ud."""
     dato = dansk_dato(dato or datetime.date.today())
 

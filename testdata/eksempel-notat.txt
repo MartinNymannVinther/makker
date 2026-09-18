@@ -1,69 +1,61 @@
-INTERNT NOTAT — OMLÆGNING AF SAGSGANGEN FOR FERIEDAGPENGE
+INTERNT NOTAT — OMLÆGNING AF FAKTURERINGSFLOWET
 Testdata. Alle navne, numre og tal er opdigtede.
 
-Journalnr.: YDL-2026-0417
-Udarbejdet af: Ydelsesafdelingen
+Journalnr.: ØKO-2026-0417
+Udarbejdet af: Økonomi og drift
 Dato: 3. august 2026
 
 
 BAGGRUND
 
-Pilotforsøget med den omlagte sagsgang for feriedagpenge kørte i afdelingerne
-i Aalborg og Kolding fra 1. februar til 30. juni 2026. I alt 1.840 sager blev
-behandlet efter den nye model.
+Pilotforsøget med det omlagte faktureringsflow kørte i afdelingerne i
+Aarhus og Odense fra 1. februar til 30. juni 2026. I alt 1.840 fakturaer
+blev sendt efter den nye model.
 
-Den gennemsnitlige sagsbehandlingstid faldt fra 18 til 11 arbejdsdage.
-Andelen af sager der måtte genoptages på grund af manglende dokumentation
-faldt fra 14 % til 6 %. Til gengæld steg antallet af telefoniske
-henvendelser i den første måned med 22 %, hvilket vurderes at skyldes at
-kvitteringsbrevet var for kortfattet.
-
-
-DEN NYE SAGSGANG
-
-1. Medlemmet søger via selvbetjeningen. Systemet henter selv feriesaldoen
-   fra arbejdsgiverindberetningen, så medlemmet ikke skal indtaste den.
-
-2. Sagen fordeles automatisk til den sagsbehandler der har færrest åbne
-   sager i den pågældende uge.
-
-3. Er dokumentationen komplet, afgøres sagen uden manuel gennemgang.
-   Det gælder ca. 6 ud af 10 sager.
-
-4. Mangler der dokumentation, sendes ét samlet rykkerbrev med en frist på
-   14 dage. Tidligere blev der sendt op til tre særskilte breve.
-
-5. Ved afslag skal begrundelsen henvise til den konkrete bestemmelse.
-   Standardformuleringer uden henvisning godkendes ikke længere.
+Den gennemsnitlige tid fra afsluttet opgave til afsendt faktura faldt fra
+18 til 11 arbejdsdage. Andelen af fakturaer der måtte krediteres på grund
+af fejl i timeregistreringen faldt fra 14 % til 6 %. Til gengæld steg
+antallet af henvendelser fra kunder i den første måned med 22 %, hvilket
+vurderes at skyldes at følgeteksten på fakturaen var for kortfattet.
 
 
-FRISTER OG NÆSTE SKRIDT
+DET NYE FLOW
 
-Den nye sagsgang rulles ud til alle afdelinger den 1. oktober 2026.
-Sagsbehandlere skal have gennemført e-læringsmodulet senest 15. september.
-Afdelingslederne melder tilbage om bemanding senest 22. august.
+1. Konsulenten registrerer timer løbende i systemet. Fakturaudkastet
+   dannes automatisk ved månedens udgang, så ingen skal samle timer op
+   bagefter.
+2. Projektlederen godkender udkastet inden for tre arbejdsdage. Godkendes
+   det ikke, sendes en påmindelse — og efter fem dage går det til
+   økonomichefen.
+3. Fakturaen sendes som e-faktura via Peppol, hvor kunden er tilmeldt.
+   Ellers som PDF med betalingsoplysninger.
+4. Betalingspåmindelse sendes automatisk otte dage efter forfald.
 
-Der laves en opfølgende måling efter tre måneder, altså primo januar 2027.
 
+ERFARINGER
 
-ÅBNE PUNKTER
+Det der virkede:
+- Automatisk udkast fjernede den månedlige "timejagt".
+- Peppol-afsendelse halverede tiden til betaling hos offentlige kunder.
+- Godkendelsestrinnet fangede fejl før kunden så dem.
 
-- Kvitteringsbrevet skal omskrives, så det forklarer hvad der sker
-  bagefter. Ansvarlig: kommunikationsteamet.
-- Det er endnu uafklaret hvordan sager med udenlandsk optjening håndteres
-  i den automatiske fordeling.
-- Der mangler en beslutning om hvorvidt den gamle sagsgang skal køre
+Det der ikke virkede:
+- Følgeteksten på fakturaen var for kort til at kunderne kunne genkende
+  opgaven. Det udløste henvendelser i stedet for betalinger.
+- Tre arbejdsdage til godkendelse er for lidt i ferieperioder.
+- Der mangler en beslutning om hvorvidt det gamle flow skal køre
   parallelt i en overgangsperiode.
 
 
-SAGSEKSEMPEL
+EKSEMPEL
 
-Medlem 010190-1234 fik i pilotforsøget afgjort sin sag på 9 dage mod
-tidligere 21. Medlemmet havde selv uploadet lønsedler, hvilket gjorde
-manuel gennemgang unødvendig.
+Kunden med CVR 12345678 fik i pilotforsøget sin faktura 9 dage efter
+opgavens afslutning mod tidligere 21. Kontaktpersonen, Anders Holm
+(010190-1234), havde selv godkendt timeopgørelsen, hvilket gjorde manuel
+gennemgang unødvendig.
 
 
 KONTAKT
 
-Spørgsmål til notatet: ydelse@aka.dk
+Spørgsmål til notatet: oekonomi@eksempel.dk
 Vagttelefon i implementeringsperioden: 33 12 44 55

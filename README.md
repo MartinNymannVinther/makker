@@ -1,4 +1,4 @@
-# AKA Assistent — egen chat (POC)
+# Chat — Haij's chatflade (POC)
 
 En chatflade oven på de model-API'er vi allerede betaler for. Ingen egen
 hostet model. Man vælger udbyder i dropdownen, og svaret kommer fra den
@@ -80,7 +80,7 @@ Filerne:
 | `app.py`            | Routing og glue. Kender hverken PDF eller Word. |
 | `extract.py`        | Tekst ud af vedhæftede filer. |
 | `docgen.py`         | Struktureret indhold ind i en Word-skabelon. |
-| `pptgen.py`         | Struktureret indhold ind i AKA's PowerPoint-skabelon. |
+| `pptgen.py`         | Struktureret indhold ind i Haij's PowerPoint-skabelon. |
 | `images.py`         | Billedgenerering via fal.ai. |
 | `settings.py`       | Det administrator kan rette. Standarder i koden, ændringer i `settings.json`. |
 | `static/index.html` | Markup. |
@@ -92,31 +92,31 @@ Frontenden er stadig uden byggetrin og uden pakker — bare tre filer browseren
 henter direkte.
 
 ## Udtryk
-Farver og formsprog er hentet fra **aka.dk** og stemmer med
-PowerPoint-skabelonens tema:
+Farver og formsprog er Haij-familiens — samme tokens som i de andre
+Haij-apps, så værktøjerne læses som ét. Varmt papir, mosgrøn, varm
+mørkebrun tekst:
 
 | | |
 |---|---|
-| Mørk lilla (tekst) | `#2E1760` |
-| Lilla (primær knap) | `#5F30C5` |
-| Lys lilla | `#BEA1F5` |
-| Mint (accent, sparsomt) | `#00FFCC` |
-| Baggrund | `#F6F6F6` |
+| Baggrund (papir) | `#F7F5F1` |
+| Flade (kort) | `#FFFDFA` |
+| Tekst | `#24221E` |
+| Mosgrøn (primær) | `#4A6B53` |
+| Mosgrøn, hover | `#31513C` |
+| Grøn tone (accent) | `#E4EBE4` |
+| Meta-tekst | `#8A8479` |
 
-Formsproget følger med: tekstknapper er pilleformede og ikonknapper runde,
-som søge- og menuknapperne på aka.dk. Overskrifter står i vægt 500, ikke
-fed. Brødteksten er mørk lilla — ikke sort.
+Grundradius er 12px; knapper er afrundede, ikke pilleformede. Mærket i
+sidebaren er Haij's tre bjælker som inline SVG, så det følger temaet.
 
-**Skriften.** aka.dk bruger Apercu, som er licenseret og derfor ikke ligger
-i projektet. `--skrift` prøver den først og falder ellers tilbage på
-systemets egen grotesk, som ligger tæt. Har I licensen, så læg filerne i
-`static/skrifter/` og fjern kommentaren fra `@font-face` i toppen af
-`app.css` — så bruges den automatisk. Der hentes bevidst ingen skrifter
-udefra; det ville sende et kald til en tredjepart ved hver sideindlæsning.
+**Skriften** er Archivo (brødtekst og overskrifter) og Geist Mono (kode),
+begge under SIL Open Font License og lagt i `static/skrifter/` — de samme
+filer som i de andre Haij-apps. Der hentes bevidst ingen skrifter udefra;
+det ville sende et kald til en tredjepart ved hver sideindlæsning.
 
-**Mørk tilstand** findes ikke på aka.dk, så den er udledt: samme lilla,
-vendt om, med en lilla-tonet baggrund frem for neutralt grå. Alle
-farvekombinationer er tjekket mod WCAG AA — den laveste er 4,6:1.
+**Mørk tilstand** er familiens: samme varme tone, vendt om, med mosgrøn
+lysnet så den bærer kontrasten. Alle farvekombinationer er tjekket mod
+WCAG AA.
 
 ## Filupload
 Klik på papirclipsen, vælg en fil, og send. Serveren trækker teksten ud og
@@ -172,18 +172,20 @@ Ved siden af Word-knappen sidder **Hent som PowerPoint**. Samme princip,
 samme endepunkt — kun `format` i kaldet skifter, og så spørges `pptgen.py`
 i stedet for `docgen.py`.
 
-Skabelonen er AKA's egen `templates/aka.pptx`. Vi åbner den og bruger dens
-layouts, så hvert slide arver skrifter, farver, logo og grafik direkte fra
-designfilen. Der står ikke én farvekode om AKA's udtryk i koden.
+Skabelonen er `templates/haij.pptx`. Vi åbner den og bruger dens layouts,
+så hvert slide arver skrifter, farver og mærke fra skabelonen — `pptgen.py`
+kender ingen farvekoder. Skabelonen bygges af `templates/lav_haij_pptx.py`
+ud fra python-pptx' standard: 16:9, Haij's farver, mærket i hjørnet. Ret
+dér og kør scriptet, så er filen genskabt uden PowerPoint.
 
 Fire slidetyper, hver bundet til et layout i skabelonen:
 
 | Type | Layout i skabelonen |
 |------|---------------------|
-| forside | Intro Slide |
-| emne | Emne Slide Mørk |
-| punkter | 1_Tekst Slide + Billede |
-| citat | Citat Slide Lys |
+| forside | Forside |
+| emne | Emne (mosgrøn) |
+| punkter | Punkter |
+| citat | Citat |
 
 **Det svære er ikke at lave filen — det er at få teksten til at passe.**
 Et Word-dokument bliver bare længere når modellen skriver for meget. Et
@@ -202,13 +204,9 @@ slide har en fast ramme. Derfor er der to slags værn:
 Talernoter er en del af skemaet. Det uddybende hører til der, ikke på
 slidet, og modellen bliver bedt om at bruge dem.
 
-**Bemærk:** AKA-skabelonen sætter selv `buNone` på tekstslides, så punkter
-står uden punkttegn. Det er skabelonens design, ikke en fejl — vil I have
-punkttegn, er det `.pptx`-filen der skal rettes, ikke koden.
-
 **Ny skabelon:** læg en `.pptx` i `templates/` og tilføj en `Skabelon` i
 `pptgen.py` med layoutnavnene og placeholder-numrene. De numre kan læses ud
-af filen med python-pptx — se kommentarerne i `AKA`-opsætningen.
+af filen med python-pptx — se kommentarerne i `HAIJ`-opsætningen.
 
 ## Gemte samtaler
 Samtalerne ligger i browserens `localStorage` — ikke på serveren. De gemmes
@@ -222,7 +220,7 @@ browseren**, ikke personen — rydder man browserdata, er de væk, og de
 findes ikke på en anden computer.
 
 Vær opmærksom på at samtalerne står ukrypteret i browserprofilen. Skal det
-i drift med rigtige medlemsdata, hører de hjemme på serveren bag SSO.
+i drift med rigtige kundedata, hører de hjemme på serveren bag SSO.
 Flytningen er afgrænset til afsnit 6 i `static/app.js` — resten af koden
 rører ikke lagringen.
 
@@ -232,8 +230,8 @@ og brugeren får det at vide.
 ## Roller
 Over skrivefeltet vælger man en **rolle** for samtalen — fx *Djævlens
 advokat*, *Sprogvasker* eller *Kreativ sparringspartner*. Rollen lægges
-oven på systemprompten, den erstatter den ikke: sproget og rammen om at det
-er AKA's assistent gælder stadig.
+oven på systemprompten, den erstatter den ikke: sproget og den ramme
+systemprompten sætter gælder stadig.
 
 Browseren sender kun rollens **id**. Selve instruksen ligger server-side og
 er defineret af administrator, så en bruger kan hverken se eller ændre den.

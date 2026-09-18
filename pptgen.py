@@ -11,9 +11,10 @@ og modeller skriver konsekvent for meget til den. Derfor er der hårde
 grænser her (MAX_PUNKTER, MAX_TEGN), og de håndhæves i koden — ikke kun i
 prompten. En model der ikke lytter, skal ikke kunne ødelægge et slide.
 
-Skabelonen er en rigtig .pptx. Vi åbner AKA's egen fil og bruger dens
-layouts, så alle slides arver skrifter, farver, logo og masteropsætning
-uden at det står beskrevet i kode ét eneste sted.
+Skabelonen er en rigtig .pptx. Vi åbner templates/haij.pptx og bruger dens
+layouts, så alle slides arver skrifter, farver, mærke og masteropsætning
+uden at det står beskrevet i kode her. Filen bygges af
+templates/lav_haij_pptx.py — ret dér, ikke i PowerPoint.
 
 Skift skabelon: læg en ny .pptx i templates/ og tilføj en Skabelon nederst.
 """
@@ -28,7 +29,7 @@ import docgen
 
 
 # Så mange punkter og så mange tegn pr. punkt kan der stå på et slide i
-# AKA-skabelonen uden at det løber ud over kanten. Tallene er fundet ved at
+# skabelonen uden at det løber ud over kanten. Tallene er fundet ved at
 # rendere og kigge — ikke gættet.
 MAX_PUNKTER = 6
 MAX_TEGN = 110
@@ -49,7 +50,7 @@ EMU_PR_PT = 12700
 
 SKEMA = """{
   "titel": "kort titel til forsiden",
-  "undertitel": "afsender eller oplægsholder, fx \\"Ydelsesafdelingen\\"",
+  "undertitel": "afsender eller oplægsholder, fx \\"Salgsafdelingen\\"",
   "slides": [
     {
       "type": "emne",
@@ -117,29 +118,28 @@ class Skabelon:
         return alle[0]
 
 
-AKA = Skabelon(
-    navn="AKA",
-    grundfil="templates/aka.pptx",
-    afsender="Akademikernes A-kasse",
+HAIJ = Skabelon(
+    navn="Haij",
+    grundfil="templates/haij.pptx",
+    afsender="Haij",
     layouts={
-        "forside": "Intro Slide",
-        "emne":    "Emne Slide Mørk",
-        "punkter": "1_Tekst Slide + Billede",
-        "citat":   "Citat Slide Lys",
+        "forside": "Forside",
+        "emne":    "Emne",
+        "punkter": "Punkter",
+        "citat":   "Citat",
     },
     # (placeholder-idx, skabelonens egen skriftstørrelse, mindste tilladte).
-    # Numrene og størrelserne er læst ud af skabelonen. Bemærk at forsiden
-    # har overskriften i 11 og oplægsholderen i 10 — ikke omvendt.
+    # Numrene og størrelserne skal stemme med templates/lav_haij_pptx.py.
     felter={
-        "forside": {"titel": (11, 60, 26), "under": (10, 18, 14)},
-        "emne":    {"tekst": (11, 40, 22)},
-        "punkter": {"titel": (0, 40, 22), "krop": (11, 18, 12)},
-        "citat":   {"citat": (11, 40, 22), "kilde": (12, 14, 12)},
+        "forside": {"titel": (0, 48, 26), "under": (1, 18, 14)},
+        "emne":    {"tekst": (0, 40, 22)},
+        "punkter": {"titel": (0, 32, 22), "krop": (1, 20, 12)},
+        "citat":   {"citat": (0, 32, 20), "kilde": (2, 16, 12)},
     },
 )
 
-SKABELONER = {"aka": AKA}
-STANDARD = "aka"
+SKABELONER = {"haij": HAIJ}
+STANDARD = "haij"
 
 
 # --- Fra modelsvar til indhold -------------------------------------------
@@ -281,7 +281,7 @@ def _udfyld(slide, felter, indhold):
             _fjern(ph)
 
 
-def byg(indhold: dict, skabelon: Skabelon = AKA, dato=None) -> bytes:
+def byg(indhold: dict, skabelon: Skabelon = HAIJ, dato=None) -> bytes:
     """Struktureret indhold ind, færdig .pptx ud."""
     prs = skabelon.præsentation()
 

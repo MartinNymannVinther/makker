@@ -17,8 +17,8 @@ STANDARD = {
     # Går forud for hver samtale. Ligger server-side med vilje: browseren
     # skal hverken kunne se eller ændre den uden om denne side.
     "system": (
-        "Du er AKA Assistent, en hjælpsom intern assistent for Akademikernes "
-        "A-kasse. Svar kort, klart og præcist på dansk."
+        "Du er en hjælpsom assistent for en dansk virksomhed. "
+        "Svar kort, klart og præcist på dansk."
     ),
 
     # Hvor langt et svar må blive. Word-dokumenter får deres eget, større loft.
@@ -30,12 +30,12 @@ STANDARD = {
 
     # --- Roller ----------------------------------------------------------
     # En rolle lægges oven på systemprompten for den enkelte chat. Den
-    # erstatter den ikke — så sproget og det at det er AKA's assistent
-    # gælder stadig, uanset hvilken rolle man vælger.
+    # erstatter den ikke — så sproget og rammen fra systemprompten gælder
+    # stadig, uanset hvilken rolle man vælger.
     "roller": [
         {
             "id": "standard",
-            "navn": "AKA Assistent",
+            "navn": "Assistent",
             "beskrivelse": "Hjælpsom og kortfattet. Standard.",
             "instruks": "",
         },
@@ -87,7 +87,7 @@ STANDARD = {
         },
         {
             "id": "grundig",
-            "navn": "Grundig sagsbehandler",
+            "navn": "Grundig læser",
             "beskrivelse": "Præcis, holder sig til materialet, siger fra.",
             "instruks":
                 "Vær præcis og forsigtig. Hold dig til det der står i "
@@ -114,8 +114,8 @@ STANDARD = {
     # og "rolle" sætter samtidig rollen, hvis opgaven har en der passer.
     "opgaver": [
         {"gruppe": "Skriv", "navn": "Svar på en henvendelse",
-         "beskrivelse": "Venligt og præcist svar til et medlem",
-         "prompt": "Skriv et venligt og præcist svar til et medlem. "
+         "beskrivelse": "Venligt og præcist svar til en kunde eller kollega",
+         "prompt": "Skriv et venligt og præcist svar på henvendelsen. "
                    "Henvendelsen er:\n\n",
          "rolle": ""},
         {"gruppe": "Skriv", "navn": "Skriv et notat",

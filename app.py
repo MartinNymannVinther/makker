@@ -1,5 +1,5 @@
 """
-AKA Assistent — minimal backend.
+Chat — minimal backend.
 
 Hele pointen: begge udbydere tales til med SAMME kode. Kun base-URL,
 API-nøgle og modelnavn skifter. Vi bruger de OpenAI-kompatible endpoints,
@@ -238,8 +238,8 @@ def systemprompt(opsætning, rolle_id):
     """Systemprompten, eventuelt med en rolle lagt oven på.
 
     Rollen erstatter ikke prompten — den lægges efter. Så gælder det at
-    svaret er på dansk og kommer fra AKA's assistent stadig, uanset hvilken
-    rolle brugeren har valgt. Browseren sender kun et id; selve teksten
+    svaret er på dansk og holder sig inden for systemprompten stadig, uanset
+    hvilken rolle brugeren har valgt. Browseren sender kun et id; selve teksten
     ligger server-side, hvor administrator bestemmer den.
     """
     prompt = opsætning["system"]

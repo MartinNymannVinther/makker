@@ -1,5 +1,5 @@
 /* ==========================================================================
-   AKA Assistent — frontend
+   Chat — frontend
 
    Ingen byggetrin og ingen pakker. Filen er delt i afsnit, så man kan
    springe direkte til det man skal rette.
@@ -67,7 +67,7 @@ tegnIkoner();
 
 function sætTema(navn) {
   document.documentElement.dataset.tema = navn;
-  try { localStorage.setItem('aka-tema', navn); } catch (e) {}
+  try { localStorage.setItem('haij-chat-tema', navn); } catch (e) {}
   const knap = $('tema');
   knap.innerHTML = svgIkon(navn === 'moerk' ? 'sol' : 'maane');
   knap.setAttribute('aria-label',
@@ -316,7 +316,7 @@ model.addEventListener('change', () => {
    på tværs af enheder, skal der login på først, og så flytter man denne
    sektion til et /api/chats-endpoint. Resten af filen kan blive som den er. */
 
-const NØGLE = 'aka-chats';
+const NØGLE = 'haij-chat-chats';
 const MAX_CHATS = 60;
 
 function hentAlle() {
@@ -546,8 +546,8 @@ function tegnSvar(besked, nr) {
 
   const hoved = document.createElement('div');
   hoved.className = 'svar-hoved';
-  hoved.innerHTML = '<span class="svar-prik" aria-hidden="true">A</span>';
-  hoved.append(document.createTextNode(besked.model || aktiv.model || 'AKA Assistent'));
+  hoved.innerHTML = '<span class="svar-prik" aria-hidden="true"></span>';
+  hoved.append(document.createTextNode(besked.model || aktiv.model || 'Chat'));
 
   const krop = document.createElement('div');
   krop.className = 'md';
@@ -1966,6 +1966,6 @@ box.focus();
 // starthøjde. Derfor efter første maling — og igen når alt er indlæst.
 requestAnimationFrame(voksFelt);
 addEventListener('load', voksFelt);
-// Skifter skriften undervejs (fx fordi Apercu ikke findes og der faldes
-// tilbage), ændrer linjehøjden sig — så mål igen når skrifterne er klar.
+// Skifter skriften undervejs (Archivo lander efter fallback-skriften),
+// ændrer linjehøjden sig — så mål igen når skrifterne er klar.
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(voksFelt);

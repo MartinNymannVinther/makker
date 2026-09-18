@@ -1,5 +1,5 @@
 /* ==========================================================================
-   AKA Assistent — stilark
+   Chat — stilark
 
    Alt visuelt styres af variablerne i :root. Vil man skifte udtryk, er det
    dem man rører — resten af filen læser kun fra dem.
@@ -8,100 +8,121 @@
 /* --- 1. Farver og mål ---------------------------------------------------- */
 
 :root {
-  /* Farverne er hentet fra aka.dk og stemmer med PowerPoint-skabelonens
-     tema. Mørk lilla er tekstfarven — ikke sort. Mint bruges sparsomt. */
-  --bg:            #f6f6f6;   /* sidens baggrund på aka.dk */
-  --surface:       #ffffff;
-  --surface-2:     #efeef4;
-  --surface-3:     #e4e1ee;
-  --line:          #e2e0ea;
-  --line-stærk:    #cdc8dc;
+  /* Haij-familiens farver: varmt papir og mosgrøn. Samme værdier som i de
+     andre Haij-apps (hex-kommentarerne dér er facit), så værktøjerne læses
+     som én familie. Teksten er varm mørkebrun — ikke sort. */
+  --bg:            #f7f5f1;   /* background */
+  --surface:       #fffdfa;   /* card */
+  --surface-2:     #f2efe9;   /* secondary */
+  --surface-3:     #f0ece5;   /* muted */
+  --line:          #eae5dc;   /* border */
+  --line-stærk:    #c9c2b6;
 
-  --tekst:         #2e1760;   /* AKA's mørke lilla */
-  --tekst-dæmpet:  #635a7d;
-  --tekst-svag:    #736b8b;   /* 4,6:1 — holder til 11px-etiketter */
+  --tekst:         #24221e;   /* foreground */
+  --tekst-dæmpet:  #6b665d;   /* muted-foreground */
+  --tekst-svag:    #8a8479;   /* meta — 4,6:1 mod papir */
 
-  --accent:        #5f30c5;   /* knapfarven på aka.dk */
-  --accent-hover:  #4c1ce0;
-  --accent-tone:   #efeafc;
-  --accent-tekst:  #ffffff;
-  --mint:          #00ffcc;   /* accent — kun i små doser */
+  --accent:        #4a6b53;   /* primary, mosgrøn */
+  --accent-hover:  #31513c;   /* primary-hover */
+  --accent-tone:   #e4ebe4;   /* accent */
+  --accent-tekst:  #f7f5f1;   /* primary-foreground */
 
-  --advarsel:      #8a5a00;
-  --advarsel-tone: #fdf3e0;
-  --advarsel-linje:#e8d5a8;
+  --advarsel:      #8c5b3e;   /* warning ink */
+  --advarsel-tone: #f6e8e0;   /* warning tint */
+  --advarsel-linje:#e5cbb9;
 
   --fejl:          #a3282b;
   --fejl-tone:     #fbecec;
 
+  /* Haij's grundradius er 12px; knapper er afrundede, ikke pilleformede. */
   --r-sm: 8px;
   --r:    12px;
-  --r-lg: 18px;
+  --r-lg: 17px;
   --r-rund: 999px;
-  --r-knap: 999px;            /* aka.dk bruger 35px — altså pilleform */
+  --r-knap: 9px;
 
-  --skygge-lav:  0 1px 2px rgba(46,23,96,.06);
-  --skygge:      0 2px 8px rgba(46,23,96,.08), 0 1px 2px rgba(46,23,96,.05);
-  --skygge-høj:  0 12px 32px rgba(46,23,96,.18);
+  --skygge-lav:  0 1px 2px rgba(36,34,30,.04);
+  --skygge:      0 2px 8px rgba(36,34,30,.07), 0 1px 2px rgba(36,34,30,.04);
+  --skygge-høj:  0 12px 32px rgba(36,34,30,.16);
 
   --sidebar-bredde: 264px;
   --spalte: 46rem;          /* læsbar tekstbredde i samtalen */
 
-  /* aka.dk bruger Apercu, som er en licenseret skrift vi ikke må levere.
-     Har I licensen, så læg filerne i static/skrifter/ og fjern
-     kommentaren fra @font-face nedenfor — så bruges den automatisk.
-     Ellers falder vi tilbage på systemets egen grotesk, som ligger tæt. */
-  --skrift: Apercu, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-            "Helvetica Neue", Arial, sans-serif;
-  --skrift-kode: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
-                 "Liberation Mono", monospace;
+  /* Archivo og Geist Mono ligger i static/skrifter/ (SIL Open Font
+     License) — samme filer som i de andre Haij-apps. Der hentes intet
+     udefra: en sideindlæsning må ikke kalde en tredjepart. */
+  --skrift: "Archivo", "Archivo Fallback", -apple-system, BlinkMacSystemFont,
+            "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --skrift-kode: "Geist Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo,
+                 Consolas, "Liberation Mono", monospace;
 }
 
-/*
+/* Én variabel fil pr. delmængde, vægt 400-600. Delmængderne er splittet
+   på unicode-range med vilje: en dansk side henter kun latin-filen. */
 @font-face {
-  font-family: "Apercu";
-  src: url("/static/skrifter/apercu-regular.woff2") format("woff2");
-  font-weight: 400; font-display: swap;
+  font-family: "Archivo";
+  font-style: normal; font-weight: 400 600; font-display: swap;
+  src: url("/static/skrifter/archivo-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
 }
 @font-face {
-  font-family: "Apercu";
-  src: url("/static/skrifter/apercu-medium.woff2") format("woff2");
-  font-weight: 500; font-display: swap;
+  font-family: "Archivo";
+  font-style: normal; font-weight: 400 600; font-display: swap;
+  src: url("/static/skrifter/archivo-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
+    U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020,
+    U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
-*/
+@font-face {
+  font-family: "Geist Mono";
+  font-style: normal; font-weight: 100 900; font-display: swap;
+  src: url("/static/skrifter/geist-mono-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* Metrisk tilpasset Arial, så teksten ikke flytter sig når Archivo lander. */
+@font-face {
+  font-family: "Archivo Fallback";
+  src: local("Arial");
+  ascent-override: 88.96%; descent-override: 21.28%;
+  line-gap-override: 0%; size-adjust: 98.7%;
+}
 
 :root[data-tema="moerk"] {
-  /* aka.dk har ingen mørk tilstand, så den er udledt: samme lilla, vendt
-     om. Baggrunden er lilla-tonet frem for neutralt grå, så det stadig
-     føles som AKA. */
-  --bg:            #17102b;
-  --surface:       #1f1738;
-  --surface-2:     #291f47;
-  --surface-3:     #342957;
-  --line:          #372c5c;
-  --line-stærk:    #4a3d75;
+  /* Haij's mørke tilstand: samme varme tone, vendt om. Mosgrøn lysnes så
+     den bærer kontrasten på mørk baggrund. Værdierne er oklch-tokens fra
+     familien oversat til hex. */
+  --bg:            #1e1c19;
+  --surface:       #262421;
+  --surface-2:     #2e2c28;
+  --surface-3:     #2c2a26;
+  --line:          #36342f;
+  --line-stærk:    #4a4740;
 
-  --tekst:         #ede9f8;
-  --tekst-dæmpet:  #a79dc4;
-  --tekst-svag:    #8b82a8;
+  --tekst:         #ece9e3;
+  --tekst-dæmpet:  #a8a297;
+  --tekst-svag:    #8f8a80;
 
-  --accent:        #bea1f5;   /* AKA's lyse lilla bærer kontrasten her */
-  --accent-hover:  #d3befa;
-  --accent-tone:   #2d2150;
-  --accent-tekst:  #2e1760;
-  --mint:          #00ffcc;
+  --accent:        #87a98e;
+  --accent-hover:  #9bbba2;
+  --accent-tone:   #2f3d33;
+  --accent-tekst:  #14201a;
 
-  --advarsel:      #e0b569;
-  --advarsel-tone: #33291a;
-  --advarsel-linje:#4d3f26;
+  --advarsel:      #d9a97a;
+  --advarsel-tone: #3a2d24;
+  --advarsel-linje:#54412f;
 
   --fejl:          #ef8a85;
   --fejl-tone:     #382322;
 
-  --skygge-lav:  0 1px 2px rgba(0,0,0,.35);
-  --skygge:      0 2px 8px rgba(0,0,0,.4), 0 1px 2px rgba(0,0,0,.3);
-  --skygge-høj:  0 12px 32px rgba(0,0,0,.55);
+  --skygge-lav:  0 1px 2px rgba(0,0,0,.3);
+  --skygge:      0 2px 8px rgba(0,0,0,.35), 0 1px 2px rgba(0,0,0,.25);
+  --skygge-høj:  0 12px 32px rgba(0,0,0,.5);
 }
+
 
 /* --- 2. Grundlag --------------------------------------------------------- */
 
@@ -152,7 +173,7 @@ button, input, textarea, select { font: inherit; color: inherit; }
   display: inline-flex; align-items: center; justify-content: center;
   width: 34px; height: 34px; flex: none;
   border: none; background: none; color: var(--tekst-dæmpet);
-  border-radius: 50%; cursor: pointer;   /* runde som på aka.dk */
+  border-radius: var(--r-knap); cursor: pointer;
   transition: background .15s, color .15s;
 }
 .ikon:hover { background: var(--surface-2); color: var(--tekst); }
@@ -189,15 +210,15 @@ button, input, textarea, select { font: inherit; color: inherit; }
   padding: 14px 12px 10px 16px;
 }
 .brand { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1; }
-.mark {
-  width: 30px; height: 30px; flex: none;
-  border-radius: 50%;
-  background: var(--accent); color: var(--accent-tekst);
-  display: flex; align-items: center; justify-content: center;
-  font-weight: 650; font-size: 15px;
-}
+/* Haij-mærket: tre venstrestillede bjælker, lang-kort-mellem, i den
+   mosgrønne rampe. Samme SVG som i de andre Haij-apps; ordmærket ved
+   siden af er levende tekst i vægt 600. */
+.mark { width: 24px; height: auto; flex: none; }
+.mark .b1 { fill: var(--accent); }
+.mark .b2 { fill: #7a9a80; }
+.mark .b3 { fill: var(--line-stærk); }
 .brand-tekst { min-width: 0; line-height: 1.25; }
-.brand-tekst b { display: block; font-size: 14px; font-weight: 620; }
+.brand-tekst b { display: block; font-size: 14px; font-weight: 600; letter-spacing: -.02em; }
 .brand-tekst span { font-size: 12px; color: var(--tekst-dæmpet); }
 
 .ny-chat {
@@ -330,10 +351,8 @@ header {
   font-size: 12px; color: var(--tekst-dæmpet);
 }
 .svar-prik {
-  width: 17px; height: 17px; border-radius: 5px;
-  background: var(--accent); color: var(--accent-tekst);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 10px; font-weight: 700;
+  width: 10px; height: 10px; border-radius: 3px;
+  background: var(--accent);
 }
 
 .filmaerke {
@@ -549,7 +568,7 @@ header {
 .opgaveikon {
   display: flex; align-items: center; justify-content: center;
   width: 29px; height: 29px; flex: none;
-  border-radius: 50%;                     /* rund, som resten af AKA */
+  border-radius: var(--r-sm);
   background: var(--accent-tone); color: var(--accent);
   transition: background .16s ease, color .16s ease;
 }

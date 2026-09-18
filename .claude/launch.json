@@ -2,7 +2,7 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "aka-chat",
+      "name": "aichat",
       "runtimeExecutable": ".venv/bin/uvicorn",
       "runtimeArgs": ["app:app", "--reload", "--port", "8000"],
       "port": 8000

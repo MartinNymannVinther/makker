@@ -1,4 +1,4 @@
-# AKA Assistent — platform-variant.
+# Platform-variant: samme idé uden egen kode.
 # Open WebUI = færdig chatflade. LiteLLM = gateway der oversætter til
 # alle udbydere og logger forbrug. Ingen kode, kun konfiguration.
 services:

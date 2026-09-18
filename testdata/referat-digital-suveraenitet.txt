@@ -35,7 +35,7 @@ Hanne Lund indledte med at minde om, at arbejdsgruppen blev nedsat i januar
 efter direktionens beslutning om at få et samlet billede af, hvor afhængige
 vi er af leverandører uden for EU. Diskussionen er ikke drevet af en konkret
 hændelse, men af at spørgsmålet er blevet stillet af både bestyrelsen og af
-et par større medlemsgrupper.
+et par større kundegrupper.
 
 Peter Krogh bemærkede, at debatten har flyttet sig markant det seneste år.
 Hvor det tidligere handlede om jura, handler det nu i lige så høj grad om
@@ -98,7 +98,7 @@ kontrakterne, tester exitplaner årligt og bruger de nye regler til at
 forhandle. Lav omkostning, lav ændring, men afhængigheden består.
 
 Scenarie B — flyt det kritiske.
-Vi flytter de tjenester, der behandler medlemsdata, til europæisk hostede
+Vi flytter de tjenester, der behandler kundedata, til europæisk hostede
 løsninger, og lader resten blive. Middel omkostning. Kræver at vi kan finde
 alternativer, der reelt kan det samme.
 
@@ -122,7 +122,7 @@ områder, hvor vi er mest afhængige, og at vi risikerer at bytte én
 afhængighed ud med en mindre leverandør med større driftsrisiko.
 
 Mette Iversen fremhævede omvendt, at det ikke kun er et spørgsmål om jura
-og drift. Hvis medlemmerne ikke har tillid til, hvor deres oplysninger
+og drift. Hvis kunderne ikke har tillid til, hvor deres oplysninger
 ligger, er det i sig selv et problem for os.
 
 Hanne Lund konkluderede, at gruppen ikke er uenig om målet, men om tempoet
@@ -159,4 +159,4 @@ NÆSTE MØDE
 Torsdag den 27. august 2026 kl. 13.00. Hovedpunkt: gennemgang af den
 afprøvede exitplan og de indhentede tilbud.
 
-Spørgsmål til referatet: digitalisering@aka.dk
+Spørgsmål til referatet: digitalisering@eksempel.dk
