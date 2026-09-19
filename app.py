@@ -1,5 +1,5 @@
 """
-Chat — minimal backend.
+Makker — minimal backend.
 
 Hele pointen: begge udbydere tales til med SAMME kode. Kun base-URL,
 API-nøgle og modelnavn skifter. Vi bruger de OpenAI-kompatible endpoints,

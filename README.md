@@ -1,4 +1,4 @@
-# Chat — Haij's chatflade (POC)
+# Makker — Haij's chatflade (POC)
 
 En chatflade oven på de model-API'er vi allerede betaler for. Ingen egen
 hostet model. Man vælger udbyder i dropdownen, og svaret kommer fra den

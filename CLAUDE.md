@@ -1,6 +1,6 @@
-# CLAUDE.md — AIChat
+# CLAUDE.md — Makker
 
-AIChat ("Chat" i UI'et) er Haij-familiens chatflade oven på de
+Makker er Haij-familiens chatflade — en at tænke højt med — oven på de
 model-API'er man allerede betaler for: Anthropic, Mistral, lokale modeller
 via Ollama og billeder via fal.ai. Ingen egen hostet model. Den er startet
 som en kunde-POC og er på vej ind i Haij-familien (haij.dk). Læs denne fil

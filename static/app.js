@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Chat — frontend
+   Makker — frontend
 
    Ingen byggetrin og ingen pakker. Filen er delt i afsnit, så man kan
    springe direkte til det man skal rette.
@@ -67,7 +67,7 @@ tegnIkoner();
 
 function sætTema(navn) {
   document.documentElement.dataset.tema = navn;
-  try { localStorage.setItem('haij-chat-tema', navn); } catch (e) {}
+  try { localStorage.setItem('makker-tema', navn); } catch (e) {}
   const knap = $('tema');
   knap.innerHTML = svgIkon(navn === 'moerk' ? 'sol' : 'maane');
   knap.setAttribute('aria-label',
@@ -316,7 +316,7 @@ model.addEventListener('change', () => {
    på tværs af enheder, skal der login på først, og så flytter man denne
    sektion til et /api/chats-endpoint. Resten af filen kan blive som den er. */
 
-const NØGLE = 'haij-chat-chats';
+const NØGLE = 'makker-chats';
 const MAX_CHATS = 60;
 
 function hentAlle() {
@@ -547,7 +547,7 @@ function tegnSvar(besked, nr) {
   const hoved = document.createElement('div');
   hoved.className = 'svar-hoved';
   hoved.innerHTML = '<span class="svar-prik" aria-hidden="true"></span>';
-  hoved.append(document.createTextNode(besked.model || aktiv.model || 'Chat'));
+  hoved.append(document.createTextNode(besked.model || aktiv.model || 'Makker'));
 
   const krop = document.createElement('div');
   krop.className = 'md';
