@@ -1,385 +1,161 @@
-# Makker — Haij's chatflade (POC)
-
-En chatflade oven på de model-API'er vi allerede betaler for. Ingen egen
-hostet model. Man vælger udbyder i dropdownen, og svaret kommer fra den
-valgte models API. Man betaler kun for tokenforbrug.
-
-## Kør lokalt
-    pip install -r requirements.txt
-    cp .env.example .env        # indsæt nøgler
-    uvicorn app:app --reload
-    # åbn http://localhost:8000
-
-## Hele idéen
-`app.py` taler med alle udbydere gennem samme kode. Vil man tilføje en
-skymodel, skriver man én linje i `MODELS`-listen. Nøglerne ligger
-server-side i miljøvariabler og kommer aldrig ud i browseren.
-
-## Lokale modeller (Ollama)
-Kører Ollama på maskinen, dukker dine installerede modeller op i dropdownen
-under **Lokalt på maskinen**. De skal ikke skrives ind nogen steder — vi
-spørger Ollama hvad der er installeret, så listen passer af sig selv.
-
-Det virker fordi Ollama også taler OpenAI-formatet: den er bare endnu en
-post i `PROVIDERS` med `base_url` mod `localhost:11434/v1/`. Filupload,
-Word-eksport og modelskift midt i en chat fungerer præcis som med
-skymodellerne.
-
-Kører Ollama ikke, sker der ingenting — listen indeholder så kun
-skymodellerne, og appen opfører sig som før. Ligger Ollama et andet sted,
-sættes `OLLAMA_URL` i `.env`.
-
-Det er her demoen bliver interessant i en suverænitetssamtale: vælger man
-en lokal model, forlader hverken spørgsmål, vedhæftede filer eller svar
-maskinen.
-
-## Billeder (fal.ai)
-Sæt `FAL_KEY` i `.env`, så dukker **FLUX schnell** og **FLUX dev** op i
-dropdownen under **Billeder (fal.ai)**. Vælg en af dem, skriv hvad billedet
-skal forestille, og svaret er et billede i stedet for tekst.
-
-Uden nøgle findes de slet ikke i listen — samme princip som med Ollama.
-
-fal taler ikke OpenAI-formatet for billeder, så de ligger ikke i
-`PROVIDERS`. `images.py` laver et almindeligt HTTP-kald med nøglen i
-headeren. Til gengæld går svaret ud ad **samme SSE-kanal** som teksten:
-`{"text": ...}` er tekst, `{"image": ...}` er et billede. Så skal browseren
-kun kunne håndtere én slags svar.
-
-Billedet hentes hjem og lægges i `static/genereret/`. Det koster lidt disk,
-men gør at billedet stadig er der i morgen, at gemte samtaler ikke går i
-stykker når fal rydder op, og at browseren aldrig selv taler med fal.
-Mappen ryddes ikke automatisk.
-
-**Flere billedmodeller?** `MODELLER` i toppen af `images.py`. Én linje med
-fal's model-id og hvor mange trin den skal bruge.
-
-### Prompten oversættes til engelsk først
-Billedmodeller forstår reelt kun engelsk. Får FLUX en dansk prompt, fejler
-den ikke — den finder selvsikkert på noget helt andet. "Et rødt æble hvor
-der er taget en bid" gav en fugl på et stykke drivtømmer. Samme sætning på
-engelsk gav et perfekt æble.
-
-Derfor sendes prompten først gennem en af tekstmodellerne, som laver den om
-til en engelsk billedprompt. UI'et viser hvad der faktisk blev sendt afsted,
-så man kan se hvorfor man fik det man fik.
-
-Hvilken model der oversætter vælges under **Indstillinger** — fx en lokal
-Ollama-model, hvis prompten ikke må forlade maskinen. Standard er
-`Mistral Small`. Går oversættelsen galt, sendes originalen videre med en
-note i stedet for at fejle.
-
-To ting at vide: billedmodeller ser ikke samtalen — kun den sidste besked
-bruges som prompt. Og et genereret billede kan ikke hældes i Word-skabelonen
-endnu; der er kun en hent-knap.
-
-Filerne:
-
-| Fil                 | Ansvar |
-|---------------------|--------|
-| `app.py`            | Routing og glue. Kender hverken PDF eller Word. |
-| `extract.py`        | Tekst ud af vedhæftede filer. |
-| `docgen.py`         | Struktureret indhold ind i en Word-skabelon. |
-| `pptgen.py`         | Struktureret indhold ind i Haij's PowerPoint-skabelon. |
-| `images.py`         | Billedgenerering via fal.ai. |
-| `settings.py`       | Det administrator kan rette. Standarder i koden, ændringer i `settings.json`. |
-| `static/index.html` | Markup. |
-| `static/app.css`    | Alt visuelt. Farver og mål står som variabler i toppen. |
-| `static/app.js`     | Frontendens logik, delt i nummererede afsnit. |
-| `static/pii.js`     | PII-filteret. Mønstrene ligger samlet i toppen. |
-
-Frontenden er stadig uden byggetrin og uden pakker — bare tre filer browseren
-henter direkte.
-
-## Udtryk
-Farver og formsprog er Haij-familiens — samme tokens som i de andre
-Haij-apps, så værktøjerne læses som ét. Varmt papir, mosgrøn, varm
-mørkebrun tekst:
-
-| | |
-|---|---|
-| Baggrund (papir) | `#F7F5F1` |
-| Flade (kort) | `#FFFDFA` |
-| Tekst | `#24221E` |
-| Mosgrøn (primær) | `#4A6B53` |
-| Mosgrøn, hover | `#31513C` |
-| Grøn tone (accent) | `#E4EBE4` |
-| Meta-tekst | `#8A8479` |
-
-Grundradius er 12px; knapper er afrundede, ikke pilleformede. Mærket i
-sidebaren er Haij's tre bjælker som inline SVG, så det følger temaet.
-
-**Skriften** er Archivo (brødtekst og overskrifter) og Geist Mono (kode),
-begge under SIL Open Font License og lagt i `static/skrifter/` — de samme
-filer som i de andre Haij-apps. Der hentes bevidst ingen skrifter udefra;
-det ville sende et kald til en tredjepart ved hver sideindlæsning.
-
-**Mørk tilstand** er familiens: samme varme tone, vendt om, med mosgrøn
-lysnet så den bærer kontrasten. Alle farvekombinationer er tjekket mod
-WCAG AA.
-
-## Filupload
-Klik på papirclipsen, vælg en fil, og send. Serveren trækker teksten ud og
-sender den retur til browseren, som lægger den ind i næste besked. Chippen
-over skrivefeltet viser hvad der er vedhæftet, og filnavnet står på beskeden
-i samtalen.
-
-Understøttet i dag: **.pdf**, **.docx**, `.txt`, `.md`.
-Grænser: 10 MB pr. fil, 60.000 tegn udtrukket tekst (længere filer klippes
-af, og chippen skriver "forkortet").
-
-Serveren gemmer ikke filer. Den læser, svarer og glemmer — så er der ingen
-sessioner at rydde op i og ingen dokumenter der ligger og flyder.
-
-**Ny filtype?** Skriv en funktion der tager `bytes` og returnerer
-`(tekst, kort note)`, og tilføj én linje i `EXTRACTORS` i `extract.py`.
-UI'et opdaterer sig selv — filvælgerens `accept` kommer fra `/api/models`.
-
-**Billeder senere.** `Attachment` har allerede et `kind`-felt. Når en model
-der kan se skal have billedet, tilføjer man `kind="image"` og pakker det som
-en content-blok i stedet for som tekst. Se opskriften nederst i `extract.py`.
-Resten af kæden — upload, chip, historik — er den samme.
-
-## Word-dokumenter
-Under hvert svar sidder **⬇ Hent som Word**. Det er bevidst bygget i to
-skarpt adskilte trin:
-
-1. **Modellen skriver.** Den bliver bedt om struktureret indhold som JSON
-   (titel, undertitel, resumé, sektioner med afsnit og punkter). Den ser
-   aldrig en Word-fil og bestemmer intet om udseendet.
-2. **Skabelonen former.** `docgen.py` hælder indholdet ind i en skabelon med
-   python-docx: forside, overskriftsstil, brødtekst, punktopstilling og
-   sidefod med sidetal.
-
-Derfor ser alle dokumenter ens ud, uanset hvilken model der svarede, og et
-nyt design kræver ikke en ny prompt.
-
-Modeller pakker gerne JSON ind i kodeblokke eller sætter en høflig sætning
-foran. `docgen.læs_svar()` klipper ind til første `{` og sidste `}` og
-retter manglende eller forkert typede felter op, så en sjusket model ikke
-vælter dokumentet.
-
-**Skift skabelon:** lav en ny `Skabelon(...)` og tilføj den i `SKABELONER`
-nederst i `docgen.py`. Farve, skrift, afsender og om der er forside er
-felter på den — koden der bygger dokumentet er den samme.
-
-**Rigtig Word-skabelon:** når designafdelingen leverer en `.docx` med logo
-og typografier, peger man `grundfil` på den. Så arver dokumentet alt fra
-Word-filen, og det er den fil man vedligeholder fremover — ikke koden.
-
-## PowerPoint
-Ved siden af Word-knappen sidder **Hent som PowerPoint**. Samme princip,
-samme endepunkt — kun `format` i kaldet skifter, og så spørges `pptgen.py`
-i stedet for `docgen.py`.
-
-Skabelonen er `templates/haij.pptx`. Vi åbner den og bruger dens layouts,
-så hvert slide arver skrifter, farver og mærke fra skabelonen — `pptgen.py`
-kender ingen farvekoder. Skabelonen bygges af `templates/lav_haij_pptx.py`
-ud fra python-pptx' standard: 16:9, Haij's farver, mærket i hjørnet. Ret
-dér og kør scriptet, så er filen genskabt uden PowerPoint.
-
-Fire slidetyper, hver bundet til et layout i skabelonen:
-
-| Type | Layout i skabelonen |
-|------|---------------------|
-| forside | Forside |
-| emne | Emne (mosgrøn) |
-| punkter | Punkter |
-| citat | Citat |
-
-**Det svære er ikke at lave filen — det er at få teksten til at passe.**
-Et Word-dokument bliver bare længere når modellen skriver for meget. Et
-slide har en fast ramme. Derfor er der to slags værn:
-
-- **Hårde grænser i koden**, ikke kun i prompten: højst 6 punkter pr. slide,
-  110 tegn pr. punkt, 70 tegn i en overskrift. Det der ikke er plads til,
-  ryger i talernoterne i stedet for at forsvinde.
-- **Automatisk tilpasning af skriftstørrelsen.** python-pptx kan ikke måle
-  tekst, så `_vælg_størrelse()` regner selv på hvor mange linjer teksten
-  fylder og skrumper til den passer i rammen. Rammens mål læses fra
-  skabelonen, så det stadig regner rigtigt hvis I skifter .pptx-fil.
-  Passer teksten i forvejen, rører vi den ikke — så beholder korte
-  overskrifter præcis skabelonens egen størrelse.
-
-Talernoter er en del af skemaet. Det uddybende hører til der, ikke på
-slidet, og modellen bliver bedt om at bruge dem.
-
-**Ny skabelon:** læg en `.pptx` i `templates/` og tilføj en `Skabelon` i
-`pptgen.py` med layoutnavnene og placeholder-numrene. De numre kan læses ud
-af filen med python-pptx — se kommentarerne i `HAIJ`-opsætningen.
-
-## Gemte samtaler
-Samtalerne ligger i browserens `localStorage` — ikke på serveren. De gemmes
-af sig selv efter hver besked, og listen i venstre side grupperer dem efter
-hvornår de sidst blev rørt.
-
-Det er et bevidst valg så længe der ikke er login: uden en bruger at binde
-samtalerne til ville server-side lagring blande alle medarbejderes chats
-sammen i én bunke. Konsekvensen er at samtalerne følger **maskinen og
-browseren**, ikke personen — rydder man browserdata, er de væk, og de
-findes ikke på en anden computer.
-
-Vær opmærksom på at samtalerne står ukrypteret i browserprofilen. Skal det
-i drift med rigtige kundedata, hører de hjemme på serveren bag SSO.
-Flytningen er afgrænset til afsnit 6 i `static/app.js` — resten af koden
-rører ikke lagringen.
-
-Der gemmes højst 60 samtaler. Løber browserens plads op, ryddes de ældste,
-og brugeren får det at vide.
-
-## Roller
-Over skrivefeltet vælger man en **rolle** for samtalen — fx *Djævlens
-advokat*, *Sprogvasker* eller *Kreativ sparringspartner*. Rollen lægges
-oven på systemprompten, den erstatter den ikke: sproget og den ramme
-systemprompten sætter gælder stadig.
-
-Browseren sender kun rollens **id**. Selve instruksen ligger server-side og
-er defineret af administrator, så en bruger kan hverken se eller ændre den.
-
-Rollen hører til chatten, ikke til den enkelte besked. Den gemmes sammen med
-samtalen og følger med når man åbner den igen — og med når man bygger et
-Word- eller PowerPoint-dokument, så tonen er den samme.
-
-## Opgavebibliotek
-Færdige opgaver man kan klikke på: *Svar på en henvendelse · Ret sproget
-igennem · Opsummer dokumentet · Udfordr min plan · Lav en tjekliste*. De
-vises på tom-skærmen og kan hentes frem igen med **Opgaver** over
-skrivefeltet.
-
-Det løser det problem, at folk der ikke bruger AI til daglig åbner en tom
-boks og ikke ved hvad de skal skrive. Her kan de se hvad værktøjet er til.
-
-**Startskærmen viser grupperne, ikke alle opgaverne.** Fem valg er til at
-overskue; seksten er en menu. Ét klik åbner gruppens 2-4 opgaver, og
-undertitlen på hvert gruppekort viser hvad der gemmer sig — uden at det
-bliver til flere valg. **Opgaver**-knappen over skrivefeltet viser fortsat
-hele listen, for der er man kommet for at lede.
-
-Selve opgavekortene er tegnet efter tre ting, som alle er målt frem og
-ikke gættet:
-
-- **Det er en menu, ikke brødtekst**, så den er ikke låst til tekstspaltens
-  bredde. Den fylder vinduet ud.
-- **To spalter, ikke tre.** Grupperne har 4-3-3-2-4 opgaver. To spalter
-  giver kun to huller i gitteret; tre giver fem — og klipper samtidig
-  forklaringerne.
-- **Ikon pr. gruppe.** Seksten ens hvide rektangler kan man ikke skimme.
-  Ikonet fortæller hvilken slags opgave det er, før man har læst titlen.
-
-En opgave lægger sin tekst i skrivefeltet med markøren klar til sidst. Har
-opgaven en rolle der passer, sættes den samtidig — *Udfordr min plan* slår
-Djævlens advokat til, uden at brugeren skal vide hvordan.
-
-**Billedopgaver** skifter på samme måde selv til en billedmodel: *Billede
-til et slide · Illustration til intranettet · Enkelt symbol ·
-Stemningsbillede*. Brugeren skal ikke vide hvilken model der kan tegne.
-Stilen står i opgaven, og motivet skriver man til sidst — så bliver
-resultatet ensartet uden at nogen skal lære at skrive billedprompter.
-
-Kræver en opgave en model der ikke findes — fx fordi der ikke er nogen
-`FAL_KEY` — vises opgaven slet ikke. Samme princip som resten: er noget
-ikke sat op, findes det ikke.
-
-Roller gælder kun tekstmodeller. Vælger man en billedmodel, slukkes
-rollevælgeren, for en billedmodel får ikke systemprompten.
-
-Begge dele redigeres under Indstillinger: navn, forklaring, instruks og
-hvilken rolle en opgave skal slå til. Standarderne står i `settings.py`.
-
-## Indstillinger (administratorsiden)
-Tandhjulet i headeren åbner en side hvor man kan se og rette systemprompten,
-svarlængden, hvilken model der oversætter billedprompter, og hele
-GDPR-filteret. Ændringer gemmes server-side i `settings.json` og slår
-igennem med det samme — ingen genstart.
-
-Standardværdierne står i `settings.py`. Kun forskellen gemmes i filen, så
-nye indstillinger i en senere version dukker op af sig selv i stedet for at
-blive overskrevet af en gammel fil. "Nulstil alt" sletter filen igen.
-
-Systemprompten ligger bevidst server-side. Browseren får den aldrig at se
-som noget den kan ændre — kun denne side kan rette den.
-
-**Der er ingen adgangskontrol.** Alle er administrator. Det er et bevidst
-valg i en demo, men også det første der skal laves om, hvis den skal ud til
-flere end dig selv.
-
-## GDPR-filter
-Før en besked sendes, scannes den i browseren. Alt sker lokalt — `pii.js`
-taler ikke med serveren, og det filteret fanger forlader aldrig maskinen.
-
-Der er to slags fund, og forskellen er vigtig:
-
-**Fund** er genkendte formater: CPR-nummer, telefonnummer, e-mailadresse,
-IBAN, kontonummer, kreditkortnummer, ICD-10-diagnosekoder, og navne når
-nogen præsenterer sig ("jeg hedder …"). De **blokerer** afsendelsen, vises
-med hvad der blev fundet, og fremhæves i selve teksten. Brugeren kan rette,
-sende alligevel, eller slå filteret fra for den enkelte chat.
-
-**Vink** er ord der peger på særlige kategorier efter artikel 9 — helbred og
-fagforeningsforhold. De **blokerer ikke**, men vises stille mens man skriver.
-Ellers ville filteret advare hver gang nogen skriver "sygemeldt", og så
-holder folk op med at læse advarslerne. Administrator kan slå blokering til
-for vink også.
-
-Kreditkort tjekkes med Luhn og IBAN med mod-97, så tilfældige tal ikke
-udløser alarm. CPR-numre **med bindestreg** meldes uanset om fødselsdatoen er
-gyldig — testnumre har sjældent en, og et misset CPR er værre end en falsk
-alarm. Uden bindestreg kræves en gyldig dato, ellers ville ethvert
-titencifret tal blive meldt.
-
-**Flere mønstre?** Listerne `MØNSTRE` og `VINK` i toppen af `static/pii.js`.
-Rækkefølgen er prioriteret, så det mest specifikke mønster vinder ved
-overlap. Ekstra ord til vink kan tilføjes direkte på administratorsiden
-uden at røre koden.
-
-Vær ærlig om hvad det er: filteret genkender **formater og faste vendinger**.
-Det kan ikke fange navne, adresser eller helbred skrevet frit i teksten, det
-kigger ikke i vedhæftede filer, og det ved intet om jeres behandlingsgrundlag.
-Det kan derfor heller ikke afgøre om noget er en overtrædelse — kun at der
-står noget der ligner personoplysninger. Det er en påmindelse, ikke en
-garanti, og den formulering står også i UI'et.
-
-## Lange svar
-Modellerne har et loft for hvor meget de må skrive. Rammer de det, stopper
-de **midt i en sætning** — og uden en besked ser det ud som om de var
-færdige. På et halvfærdigt program er det svært at gennemskue.
-
-Derfor kigger `stream()` på `finish_reason`. Er den `"length"`, sendes en
-`afkortet`-hændelse ud ad SSE-kanalen, og UI'et viser en linje under svaret
-med knappen **Fortsæt svaret**. Fortsættelsen strømmer ind i det samme svar
-— ikke som en ny boble — så teksten står som ét hele, også når samtalen
-gemmes og hentes frem igen.
-
-Instruksen om at fortsætte lægges på server-side, så den ikke havner i den
-gemte samtale.
-
-Standardgrænsen er 4096 tokens, hvilket rækker til et typisk lille
-HTML-program. Den kan sættes op til 32.000 under Indstillinger.
-
-## Kendte kanter
-- GDPR-filteret scanner kun det brugeren skriver, ikke vedhæftede filer. Et
-  CPR-nummer inde i en PDF bliver altså ikke fanget.
-- Indstillingssiden har ingen adgangskontrol. Enhver med adgang til appen
-  kan ændre systemprompten og slå filteret fra.
-- Scannede PDF'er uden tekstlag kan ikke læses. Brugeren får det at vide.
-  OCR ville være næste skridt.
-- Tabeller i .docx læses, men havner samlet til sidst i teksten, fordi
-  python-docx lister dem for sig.
-- Markdown oversættes af en lille indbygget parser (afsnit 4 i `app.js`).
-  Den dækker overskrifter, lister, tabeller, kode, citater og links — ikke
-  fodnoter og andre randformater.
-
-## Fra POC til drift
-- Skift Anthropics OpenAI-kompatible endpoint ud med det native SDK, hvis
-  I vil have prompt caching og de sidste features. Mistral kan blive på
-  OpenAI-formatet.
-- Læg login foran (SSO), og sæt en LiteLLM-gateway imellem hvis I vil have
-  forbrugslogning og budgetter pr. bruger. Se platform-eksemplet.
-- Læg rettigheder på indstillingssiden, så ikke enhver bruger kan ændre
-  systemprompten eller slå GDPR-filteret fra.
-- Flyt samtalerne fra browseren til serveren, når der er en bruger at binde
-  dem til.
-- Sæt en grænse på uploadstørrelse og en virusscanning foran, hvis det skal
-  ud til alle medarbejdere.
-- Overvej om PII-filteret også skal scanne vedhæftede filer, og om det skal
-  kunne blokere helt i stedet for kun at advare.
+# Makker
+
+Makker ([makker.haij.dk](https://makker.haij.dk)) is an open source chat
+to think out loud with, on language models that stay in the EU or on
+your own server. Write the way you talk, attach a report or a draft,
+pick a role — sparring partner, devil's advocate, plain-language editor,
+teacher — and read the answer as it is written. Ask for a memo or a
+deck and download it as Word or PowerPoint in Haij's template. A filter
+in the browser stops personal data before it leaves the machine.
+
+Every conversation is one person's: nobody else in the workspace can
+see it, not the owner either. The workspace's administrator shapes the
+frame — the system prompt, the roles, the task library, the filter —
+and a person thinks inside it.
+
+Makker is one tool in the [Haij](https://haij.dk) family and stands on
+the Haij foundation, taken by way of
+[Ajour](https://github.com/MartinNymannVinther/ajour),
+[Tavle](https://github.com/MartinNymannVinther/tavle) and
+[Domino](https://github.com/MartinNymannVinther/domino): Danish-first,
+EU-sovereign, secure by design. The project constitution — dogmas,
+principles, architecture and rules — lives in [CLAUDE.md](CLAUDE.md).
+Decisions and their trade-offs live in [docs/adr](docs/adr/).
+
+## Status
+
+0.1, wave 0: the foundation from Domino (auth with passkeys and TOTP,
+workspaces separated in the database, admission by invitation, the
+audit log, CI, Docker), the product's tables with RLS, audit and
+isolation tests, and an empty front door. The conversation itself, the
+roles, the files and the exports arrive wave by wave (CLAUDE.md,
+roadmap). Nothing has run real work yet; dogma seven is what 1.0 waits
+for.
+
+Makker grew out of a Python proof of concept that showed the whole
+product on one machine with no database and no login. It lives on in
+[`poc/`](poc/) as the reference for what Makker must do, tagged `poc`
+at its last commit, and is not maintained beyond that (ADR 0001).
+
+Much of the code is written together with Claude Code, under the rules
+in [CLAUDE.md](CLAUDE.md). Every change is reviewed, tested and deployed
+by a person; the tests for tenancy isolation are the part of the
+codebase that is trusted least to good intentions.
+
+## What it is
+
+**A conversation is yours.** It is stored on the server, so it is there
+tomorrow and on your phone, and it is stored under a policy in the
+database that lets nobody but you read it — not a colleague, not the
+workspace's owner, not a bug in the application.
+
+**Roles, not prompts.** The workspace's administrator writes the system
+prompt once. A role is laid over it for one conversation and never
+replaces it, so the language and the frame hold whichever role a person
+picks. The defaults are the POC's six; a workspace can change them.
+
+**Tasks you can click.** A library of ready-made tasks — answer an
+enquiry, summarise the document, challenge my plan — that fills the
+writing field and picks the role that fits.
+
+**Files as text.** PDF, Word, text and Markdown are read once at upload
+and go into the conversation as text. The file stays with the
+conversation and travels with the export.
+
+**Two steps to a document.** The model delivers a memo or a deck as
+structured content; a template layer shapes it into Word or PowerPoint.
+The look is always Haij's, and the model never touches a layout.
+
+**The filter runs in the browser.** Before anything is sent, the page
+looks for national ID numbers, account numbers, addresses and words
+that point at health, finances or criminal cases. It warns, and it
+blocks what must not be sent. Nothing leaves the machine to be checked.
+
+**Runs where you say.** Mistral at the EU endpoint, or Ollama on your
+own machine, behind one adapter; the installation sets the default and
+a workspace may choose its own. Those two, and no other.
+
+## Haij-dogmerne
+
+Makker lever efter familiens syv dogmer. De står her i Haijs egne ord.
+
+1. **Ægte open source.** Al kode ligger offentligt under AGPL-3.0. Alt vi driver, kan hentes 1:1 og køres et andet sted eller lokalt, og der findes ingen funktioner der kun kan fås på haij.dk. En betalt udgave er i orden, men den bygger på den samme kode. Kloner man repoet, får man præcis det der kører på haij.dk.
+
+2. **Egen drift.** Hvert værktøj kan køre i eget driftsmiljø på én server med Docker Compose, en Postgres og en lokal sprogmodel gennem Ollama, uden en eneste nøgle til en sky. Funktioner der forudsætter en ekstern tjeneste, som CVR-opslag eller e-faktura, siger det direkte og lader resten virke i stedet for at gå i stykker. Testen er enkel: afbryd forbindelsen til internettet, og alt væsentligt skal stadig virke.
+
+3. **Dine data, altid.** Alt en organisation ejer kan hentes ud med ét klik i åbne formater (regneark, JSON, PDF) uden at spørge nogen, og slettes helt igen. At forlade Haij skal kunne gøres med få klik uden unødvendig friktion, og vi hjælper gerne med flytningen frem for at gøre den besværlig.
+
+4. **EU eller egen drift.** Når vi hoster, ligger alt hos EU-ejede leverandører på EU-jord, sprogmodeller inklusive, og hvert værktøj har en offentlig liste over hvem der kan se hvad. Ingen amerikansk sky i driften. Koden ligger på GitHub, som er kodehosting og ikke kundedata; et spejl hos en europæisk forge kommer den dag det giver mening.
+
+5. **AI'en hjælper, mennesket bestemmer.** AI må foreslå, skrive udkast og rette i planer, men aldrig sende noget ud af ”huset”, slette noget eller forpligte nogen uden at et menneske har sagt ja. Alt AI gør, kan fortrydes. Indhold hentet udefra behandles som data, aldrig som instruktioner.
+
+6. **Sikkerhed fra første dag.** Organisationers data er adskilt i databasen, ikke kun i koden, og der skal være en test der beviser det. Alle ændringer registreres i en log der ikke kan redigeres. Passkeys og totrinslogin er der fra start, der er en offentlig vej til at melde sikkerhedshuller, og der ligger aldrig hemmeligheder i koden.
+
+7. **Brugt i virkeligheden.** Intet af det vi selv har bygget kommer i vinduet før det har kørt rigtigt arbejde, hos os selv eller hos en kunde vi sidder tæt på. Værktøjer fra andre skal have et rigtigt brugssted vi kan pege på. Vi skal ikke have værktøjer liggende som ikke har skabt reel værdi i virkeligheden.
+
+## Quickstart
+
+Requirements: Node 22+, pnpm 10+ (`brew install pnpm`; newer Node builds no longer bundle corepack), Docker.
+
+```bash
+git clone https://github.com/MartinNymannVinther/makker.git && cd makker
+pnpm install
+cp .env.example .env                            # defaults work for local dev
+docker compose -f docker-compose.dev.yml up -d --wait  # Postgres 16 + runtime roles, ready
+pnpm db:migrate                                 # tables, RLS, audit triggers
+pnpm dev                                        # http://localhost:3000
+```
+
+Register at `/register` — signup creates your user and your workspace —
+then add a passkey under Indstillinger → Sikkerhed. Registration is closed
+by default (`SIGNUP=closed`): an empty installation always lets the first
+person in, the door shuts by itself once that account exists, and everyone
+after that applies at `/register` and is admitted by the installation's
+owner with a single-use link (Indstillinger → Adgang). Colleagues do not
+apply: a member of a workspace invites them with a link from Indstillinger
+→ Arbejdsrum.
+
+```bash
+pnpm test        # RLS isolation, the export, the gates
+pnpm lint && pnpm typecheck
+```
+
+The tests run against the database from the compose file and never call
+an AI model, so they pass offline and without keys.
+
+Two things the first run can trip over, both of which `pnpm db:migrate`
+names when they happen. The Postgres image has to be pulled and the
+cluster initialised the first time, so `--wait` matters; a migrate fired
+before that is done fails and leaves an empty database behind. And if
+another Postgres already holds port 5432 on your machine (Haij's, Ajour's,
+Tavle's or Domino's dev database, a local install), Makker's container
+comes up without its port and the migration talks to the wrong server: set
+`POSTGRES_PORT=5435` in `.env` and change the three URLs to match.
+
+## Running it for real
+
+[docs/launch.md](docs/launch.md) is the ordered checklist for taking an
+installation live the first time, including the two steps that are painful
+to get wrong: the public URL passkeys bind to, and creating the first
+account before anybody else finds the address.
+[docs/deploy.md](docs/deploy.md) is the deployment guide behind it: Docker
+Compose on an EU VPS, with Coolify doing the plumbing. Which third parties can
+see data, and what, is listed in
+[docs/subprocessors.md](docs/subprocessors.md) — today that is the
+hosting provider and the AI provider you choose. With `LLM_PROVIDER=ollama`
+nothing leaves the server at all.
+
+## Contributing and security
+
+[CONTRIBUTING.md](CONTRIBUTING.md) explains how changes are made here:
+plan first, vertical slices, tests where they matter, an ADR for every
+decision worth arguing about later.
+[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) covers how we talk to each
+other. Found a security problem? Please report it privately as described
+in [SECURITY.md](SECURITY.md) rather than in a public issue.
+
+What we know is not right yet is written down rather than hoped away:
+[TECH-DEBT.md](TECH-DEBT.md) lists it, with the reason it is still there
+and what fixing it would take.
+
+License: [AGPL-3.0](LICENSE). The two typefaces the interface is set in ship in `public/fonts`, both under the SIL Open Font License 1.1: Archivo by the Archivo Project Authors ([OFL.txt](public/fonts/OFL.txt)) and Geist Mono by the Geist Project Authors ([OFL-Geist.txt](public/fonts/OFL-Geist.txt)). The `.woff2` files are Google Fonts' own subsets, copied in so that a build needs no network.

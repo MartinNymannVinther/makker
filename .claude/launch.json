@@ -3,9 +3,9 @@
   "configurations": [
     {
       "name": "makker",
-      "runtimeExecutable": ".venv/bin/uvicorn",
-      "runtimeArgs": ["app:app", "--reload", "--port", "8000"],
-      "port": 8000
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["dev"],
+      "port": 3000
     }
   ]
 }
