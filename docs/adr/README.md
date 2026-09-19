@@ -31,3 +31,4 @@ session reads, and **TECH-DEBT.md** is what we know is not right yet.
 | [0009](0009-ai-installation-roof.md)          | The installation's own roof over the AI                                |           |
 | [0010](0010-a-conversation-is-one-persons.md) | A conversation is one person's — RLS reads the person too              | → 0002    |
 | [0011](0011-streaming-in-the-adapter.md)      | Streaming in the adapter — `stream()` beside `complete()`              |           |
+| [0012](0012-the-library-is-the-workspaces.md) | The library is the workspace's, seeded from the POC on first use       |           |

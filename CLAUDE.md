@@ -201,7 +201,7 @@ codebase to:
   per-person policy, the SSE chat route through the AI door, the chat
   page with the list and the writing field, files as text, the title
   proposed by the model, per-person export (ADR 0010).
-- Wave 3: the library — the system prompt, the roles, the task library
+- Wave 3 (done): the library — the system prompt, the roles, the task library
   and the filter's settings per workspace, seeded from the POC's
   defaults, edited by owners and admins under Settings; the role picker
   and the task picker in the chat.
