@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import { LibraryReset } from "@/components/library/library-reset";
+import { PiiForm } from "@/components/library/pii-form";
 import { PromptForm } from "@/components/library/prompt-form";
 import { RolesAdmin } from "@/components/library/roles-admin";
 import { TasksAdmin } from "@/components/library/tasks-admin";
@@ -68,6 +69,13 @@ export default async function LibraryPage() {
           roleId: task.roleId,
         }))}
         roles={roles.map((r) => ({ id: r.id, name: r.name }))}
+        canEdit={canEdit}
+      />
+      <PiiForm
+        enabled={settings.piiEnabled}
+        disabled={settings.piiDisabled}
+        extraWords={settings.piiExtraWords}
+        blockOnHint={settings.piiBlockOnHint}
         canEdit={canEdit}
       />
       {canEdit ? <LibraryReset /> : null}

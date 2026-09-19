@@ -497,6 +497,23 @@
         "confirm": "Nulstil",
         "done": "Biblioteket er nulstillet.",
         "failed": "Biblioteket blev ikke nulstillet. Prøv igen."
+      },
+      "pii": {
+        "title": "Filter for personoplysninger",
+        "subtitle": "Kører i browseren, før noget sendes. Her bestemmer du hvad det kigger efter; selve oplysningerne ser serveren aldrig.",
+        "enabled": "Filteret er slået til i arbejdsrummet",
+        "patternsTitle": "Formater der blokerer afsendelsen",
+        "hintsTitle": "Ord der giver et vink",
+        "extraWords": "Egne ord under {group}",
+        "extraWordsPlaceholder": "fx migræne, sygefravær",
+        "extraWordsHelp": "Adskil med komma. Ordene matches som hele ord, uden forskel på store og små bogstaver.",
+        "blockOnHint": "Et vink alene må blokere afsendelsen",
+        "blockOnHintHelp": "Som udgangspunkt nej — ellers advarer filteret hver gang nogen skriver „sygemeldt“, og så holder folk op med at læse advarslerne.",
+        "save": "Gem",
+        "saving": "Gemmer …",
+        "saved": "Gemt",
+        "saveFailed": "Kunne ikke gemmes. Prøv igen.",
+        "notAllowed": "Kun ejere og administratorer kan rette filteret."
       }
     }
   },
@@ -678,6 +695,41 @@
       "deleteTitle": "Slet samtalen?",
       "deleteBody": "Samtalen, alle dens beskeder og de filer du vedhæftede, slettes for altid. Hent en eksport først, hvis du vil beholde den.",
       "deleteConfirm": "Slet samtalen"
+    },
+    "pii": {
+      "title": "Beskeden ser ud til at indeholde personoplysninger.",
+      "notSent": "Den er ikke sendt.",
+      "softTitle": "Beskeden nævner måske følsomme oplysninger.",
+      "softBody": "Du kan sende som normalt.",
+      "edit": "Rediger beskeden",
+      "sendAnyway": "Send alligevel",
+      "disable": "Slå filteret fra for denne samtale",
+      "off": "Filteret er slået fra for denne samtale.",
+      "enable": "Slå det til igen",
+      "note": "Filteret genkender kendte formater — CPR, mail, konto- og kortnumre, diagnosekoder — og enkelte faste vendinger som „jeg hedder“. Det kan ikke fange navne, adresser eller helbred skrevet frit i teksten, det kigger ikke i vedhæftede filer, og det ved intet om jeres behandlingsgrundlag. Det er en påmindelse, ikke en garanti.",
+      "softNote": "Filteret kan ikke se selve oplysningerne — kun at ordene optræder.",
+      "names": {
+        "cpr": "Muligt CPR-nummer",
+        "card": "Muligt kortnummer",
+        "iban": "Muligt IBAN-nummer",
+        "account": "Muligt kontonummer",
+        "email": "Mulig e-mailadresse",
+        "phone": "Muligt telefonnummer",
+        "icd": "Mulig diagnosekode",
+        "name": "Muligt navn",
+        "health": "Helbredsoplysninger",
+        "union": "Fagforeningsforhold"
+      },
+      "explain": {
+        "health": "Helbred er en særlig kategori efter GDPR artikel 9 og kræver et strengere grundlag end almindelige oplysninger.",
+        "union": "Fagforeningsmedlemskab er også en særlig kategori efter artikel 9."
+      }
+    },
+    "documents": {
+      "word": "Hent som Word",
+      "powerpoint": "Hent som PowerPoint",
+      "making": "Laver dokument …",
+      "failed": "Dokumentet kunne ikke laves. Prøv igen."
     }
   }
 }

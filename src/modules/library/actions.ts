@@ -37,6 +37,16 @@ export const SettingsInput = z.object({
   maxTokens: z.coerce.number().int().min(256).max(32_000),
 });
 
+export const PiiInput = z.object({
+  piiEnabled: z.boolean(),
+  piiDisabled: z.array(z.string().min(1).max(20)).max(20),
+  piiExtraWords: z.record(
+    z.string().min(1).max(20),
+    z.array(z.string().trim().min(1).max(40)).max(50),
+  ),
+  piiBlockOnHint: z.boolean(),
+});
+
 export const RoleInput = z.object({
   id: Id.nullable().optional(),
   key: Key,
@@ -66,6 +76,18 @@ export async function saveSettingsAction(raw: unknown): Promise<Result<Workspace
   const result = await updateWorkspaceSettings(ctx, parsed.data);
   if (typeof result === "string") return fail(refusal(result));
   revalidatePath(PATH);
+  return ok(result);
+}
+
+export async function savePiiAction(raw: unknown): Promise<Result<WorkspaceSettingsRow>> {
+  const ctx = await requireOrgContext();
+  if (!ctx) return fail("unauthorized");
+  const parsed = PiiInput.safeParse(raw);
+  if (!parsed.success) return fail("invalid");
+  const result = await updateWorkspaceSettings(ctx, parsed.data);
+  if (typeof result === "string") return fail(refusal(result));
+  revalidatePath(PATH);
+  revalidatePath("/chat");
   return ok(result);
 }
 

@@ -5,14 +5,20 @@ import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "@/i18n/navigation";
+import { scan, type PiiSettings, type ScanResult } from "@/lib/pii";
 import { askAi } from "@/modules/ai/read-client";
 import { discardFileAction, setConversationRoleAction } from "@/modules/chat/actions";
 import { decodeEvents, type ChatFailure, type ChatStreamEvent } from "@/modules/chat/wire";
 import { Composer, type RoleOption, type TaskOption } from "./composer";
 import { ConversationTitle } from "./conversation-title";
+import { DocumentButtons } from "./document-buttons";
 import { MessageItem, type ChatFile, type ChatLine } from "./message-item";
+import { PiiNotice } from "./pii-notice";
 
 type Conversation = { id: string; title: string; roleId: string | null };
+
+/** The filter's tuning, from the workspace's settings; `enabled` is the administrator's switch. */
+export type PiiConfig = PiiSettings & { enabled: boolean; blockOnHint: boolean };
 
 type UploadAnswer = {
   ok: boolean;
@@ -37,6 +43,7 @@ export function ChatView({
   roles,
   tasks,
   modelConfigured,
+  pii,
 }: {
   conversation: Conversation | null;
   messages: ChatLine[];
@@ -44,6 +51,7 @@ export function ChatView({
   roles: RoleOption[];
   tasks: TaskOption[];
   modelConfigured: boolean;
+  pii: PiiConfig;
 }) {
   const t = useTranslations("chat");
   const locale = useLocale();
@@ -58,7 +66,21 @@ export function ChatView({
   const [draft, setDraft] = useState("");
   const [roleId, setRoleId] = useState<string | null>(conversation?.roleId ?? null);
   const [failure, setFailure] = useState<ChatFailure | null>(null);
+  // The filter: off for this conversation is a choice the person makes
+  // here and now, and it lasts as long as the page does.
+  const [piiOff, setPiiOff] = useState(false);
+  const [piiApproved, setPiiApproved] = useState(false);
   const scroller = useRef<HTMLDivElement>(null);
+
+  const piiActive = pii.enabled && !piiOff;
+  const piiResult: ScanResult | null =
+    piiActive && draft.trim()
+      ? scan(draft, { disabled: pii.disabled, extraWords: pii.extraWords })
+      : null;
+  const piiBlocks =
+    piiResult !== null &&
+    (piiResult.findings.length > 0 || (pii.blockOnHint && piiResult.hints.length > 0));
+  const piiShows = piiResult !== null && (piiBlocks || piiResult.hints.length > 0);
 
   useEffect(() => {
     scroller.current?.scrollTo({ top: scroller.current.scrollHeight });
@@ -69,10 +91,14 @@ export function ChatView({
     conversation && last?.role === "assistant" && last.truncated && !busy,
   );
 
-  async function send(continueLast = false) {
+  async function send(continueLast = false, approved = piiApproved) {
     const message = draft.trim();
     if (busy) return;
     if (!continueLast && !message && pendingFiles.length === 0) return;
+    // The filter runs here, on the person's own machine, before a byte
+    // leaves it. A blocked line stays in the field with the notice above.
+    if (!continueLast && piiBlocks && !approved) return;
+    setPiiApproved(false);
     setBusy(true);
     setFailure(null);
     setWriting("");
@@ -212,10 +238,16 @@ export function ChatView({
     if (!result.ok) toast.error(t("failed.generic"));
   }
 
+  function focusDraft(select?: { start: number; end: number }) {
+    const field = document.querySelector<HTMLTextAreaElement>("textarea[data-slot=textarea]");
+    field?.focus();
+    if (field && select) field.setSelectionRange(select.start, select.end);
+  }
+
   function applyTask(task: TaskOption) {
     setDraft((was) => (was.trim() ? `${task.prompt}${was}` : task.prompt));
     if (task.roleId) void chooseRole(task.roleId);
-    document.querySelector<HTMLTextAreaElement>("textarea[data-slot=textarea]")?.focus();
+    focusDraft();
   }
 
   const filesFor = (messageId: string) => files.filter((f) => f.messageId === messageId);
@@ -232,6 +264,9 @@ export function ChatView({
               router.refresh();
             }}
           />
+          {lines.length > 0 ? (
+            <DocumentButtons conversationId={conversation.id} disabled={!modelConfigured || busy} />
+          ) : null}
         </header>
       ) : null}
       <div
@@ -300,6 +335,34 @@ export function ChatView({
           ) : null}
         </div>
       </div>
+      {piiShows && piiResult ? (
+        <div className="px-4 pb-2 sm:px-6">
+          <PiiNotice
+            result={piiResult}
+            blocking={piiBlocks}
+            onEdit={() => {
+              const first = piiResult.findings[0];
+              focusDraft(first ? { start: first.start, end: first.end } : undefined);
+            }}
+            onSendAnyway={() => {
+              setPiiApproved(true);
+              void send(false, true);
+            }}
+            onDisable={() => {
+              setPiiOff(true);
+              focusDraft();
+            }}
+          />
+        </div>
+      ) : null}
+      {pii.enabled && piiOff ? (
+        <p className="text-meta px-4 pb-1 text-xs sm:px-6">
+          {t("pii.off")}{" "}
+          <button type="button" className="underline" onClick={() => setPiiOff(false)}>
+            {t("pii.enable")}
+          </button>
+        </p>
+      ) : null}
       <Composer
         draft={draft}
         onDraft={setDraft}

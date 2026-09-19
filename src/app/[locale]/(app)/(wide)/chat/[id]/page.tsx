@@ -7,7 +7,7 @@ import { getOrgContext } from "@/core/auth/session";
 import { redirect } from "@/i18n/navigation";
 import { modelConfigured } from "@/modules/ai/service";
 import { getConversation, listConversations } from "@/modules/chat/service";
-import { listRoles, listTasks } from "@/modules/library/service";
+import { getWorkspaceSettings, listRoles, listTasks } from "@/modules/library/service";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -29,12 +29,19 @@ export default async function ConversationPage({ params }: Params) {
   const { id } = await params;
   const view = await getConversation(ctx, id);
   if (!view) notFound();
-  const [conversations, roles, tasks, hasModel] = await Promise.all([
+  const [conversations, roles, tasks, hasModel, settings] = await Promise.all([
     listConversations(ctx),
     listRoles(ctx),
     listTasks(ctx),
     modelConfigured(ctx),
+    getWorkspaceSettings(ctx),
   ]);
+  const pii = {
+    enabled: settings.piiEnabled,
+    disabled: settings.piiDisabled,
+    extraWords: settings.piiExtraWords,
+    blockOnHint: settings.piiBlockOnHint,
+  };
   return (
     <ChatShell conversations={conversations} activeId={view.conversation.id}>
       <ChatView
@@ -61,6 +68,7 @@ export default async function ConversationPage({ params }: Params) {
         roles={roles}
         tasks={tasks}
         modelConfigured={hasModel}
+        pii={pii}
       />
     </ChatShell>
   );

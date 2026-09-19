@@ -6,7 +6,7 @@ import { getOrgContext } from "@/core/auth/session";
 import { redirect } from "@/i18n/navigation";
 import { modelConfigured } from "@/modules/ai/service";
 import { listConversations } from "@/modules/chat/service";
-import { listRoles, listTasks } from "@/modules/library/service";
+import { getWorkspaceSettings, listRoles, listTasks } from "@/modules/library/service";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("chat");
@@ -20,12 +20,19 @@ export default async function NewChatPage() {
     redirect({ href: "/login", locale: await getLocale() });
     return null;
   }
-  const [conversations, roles, tasks, hasModel] = await Promise.all([
+  const [conversations, roles, tasks, hasModel, settings] = await Promise.all([
     listConversations(ctx),
     listRoles(ctx),
     listTasks(ctx),
     modelConfigured(ctx),
+    getWorkspaceSettings(ctx),
   ]);
+  const pii = {
+    enabled: settings.piiEnabled,
+    disabled: settings.piiDisabled,
+    extraWords: settings.piiExtraWords,
+    blockOnHint: settings.piiBlockOnHint,
+  };
   return (
     <ChatShell conversations={conversations} activeId={null}>
       <ChatView
@@ -36,6 +43,7 @@ export default async function NewChatPage() {
         roles={roles}
         tasks={tasks}
         modelConfigured={hasModel}
+        pii={pii}
       />
     </ChatShell>
   );

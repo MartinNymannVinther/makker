@@ -497,6 +497,23 @@
         "confirm": "Reset",
         "done": "The library has been reset.",
         "failed": "The library was not reset. Try again."
+      },
+      "pii": {
+        "title": "Personal-data filter",
+        "subtitle": "Runs in the browser before anything is sent. Here you decide what it looks for; the server never sees the data itself.",
+        "enabled": "The filter is on in this workspace",
+        "patternsTitle": "Formats that block sending",
+        "hintsTitle": "Words that give a hint",
+        "extraWords": "Your own words under {group}",
+        "extraWordsPlaceholder": "e.g. migraine, sick leave",
+        "extraWordsHelp": "Separate with commas. Words match whole words, case-insensitively.",
+        "blockOnHint": "A hint alone may block sending",
+        "blockOnHintHelp": "Off by default — otherwise the filter warns every time somebody writes “sick”, and people stop reading the warnings.",
+        "save": "Save",
+        "saving": "Saving …",
+        "saved": "Saved",
+        "saveFailed": "Could not be saved. Try again.",
+        "notAllowed": "Only owners and administrators can edit the filter."
       }
     }
   },
@@ -678,6 +695,41 @@
       "deleteTitle": "Delete the conversation?",
       "deleteBody": "The conversation, every message in it and the files you attached are deleted for good. Take an export first if you want to keep it.",
       "deleteConfirm": "Delete the conversation"
+    },
+    "pii": {
+      "title": "The message looks like it contains personal data.",
+      "notSent": "It has not been sent.",
+      "softTitle": "The message may mention sensitive information.",
+      "softBody": "You can send as usual.",
+      "edit": "Edit the message",
+      "sendAnyway": "Send anyway",
+      "disable": "Switch the filter off for this conversation",
+      "off": "The filter is off for this conversation.",
+      "enable": "Switch it back on",
+      "note": "The filter recognises known formats — national ID, e-mail, account and card numbers, diagnosis codes — and a few fixed phrases like “my name is”. It cannot catch names, addresses or health written freely in prose, it does not look inside attached files, and it knows nothing of your legal basis. A reminder, not a guarantee.",
+      "softNote": "The filter cannot see the information itself — only that the words appear.",
+      "names": {
+        "cpr": "Possible national ID number",
+        "card": "Possible card number",
+        "iban": "Possible IBAN",
+        "account": "Possible account number",
+        "email": "Possible e-mail address",
+        "phone": "Possible phone number",
+        "icd": "Possible diagnosis code",
+        "name": "Possible name",
+        "health": "Health information",
+        "union": "Trade union membership"
+      },
+      "explain": {
+        "health": "Health is a special category under GDPR article 9 and needs a stricter basis than ordinary data.",
+        "union": "Trade union membership is a special category under article 9 too."
+      }
+    },
+    "documents": {
+      "word": "Download as Word",
+      "powerpoint": "Download as PowerPoint",
+      "making": "Making the document …",
+      "failed": "The document could not be made. Try again."
     }
   }
 }

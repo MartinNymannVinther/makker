@@ -205,7 +205,7 @@ codebase to:
   and the filter's settings per workspace, seeded from the POC's
   defaults, edited by owners and admins under Settings; the role picker
   and the task picker in the chat.
-- Wave 4: documents — the two-step Word and PowerPoint export with
+- Wave 4 (done): documents — the two-step Word and PowerPoint export with
   Haij's template (`docx`, `pptxgenjs`), the schema the model answers
   in, the PII filter moved into the browser as `src/lib/pii.ts`.
 - Wave 5: demo and operations — the demo workspace per visit, the
