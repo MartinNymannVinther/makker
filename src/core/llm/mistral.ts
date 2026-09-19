@@ -1,10 +1,14 @@
+import { readLines, sseData } from "./lines";
 import {
   LlmError,
   type LlmCompletion,
   type LlmCompletionOptions,
+  type LlmFinish,
   type LlmHealth,
   type LlmMessage,
   type LlmProvider,
+  type LlmStreamEvent,
+  type LlmUsage,
 } from "./types";
 
 type FetchLike = typeof fetch;
@@ -24,11 +28,32 @@ type FetchLike = typeof fetch;
  */
 export const MISTRAL_EU_BASE_URL = "https://api.eu.mistral.ai/v1";
 
+type Usage = { prompt_tokens?: number; completion_tokens?: number };
+
 type ChatResponse = {
   model?: string;
-  choices?: Array<{ message?: { content?: string } }>;
-  usage?: { prompt_tokens?: number; completion_tokens?: number };
+  choices?: Array<{ message?: { content?: string }; finish_reason?: string | null }>;
+  usage?: Usage;
 };
+
+/** One server-sent event of a streamed chat completion. */
+type ChatChunk = {
+  model?: string;
+  choices?: Array<{ delta?: { content?: string | null }; finish_reason?: string | null }>;
+  usage?: Usage | null;
+};
+
+function finishOf(reason: string | null | undefined): LlmFinish {
+  if (reason === "stop") return "stop";
+  if (reason === "length") return "length";
+  return "unknown";
+}
+
+function usageOf(usage: Usage | null | undefined): LlmUsage {
+  return usage?.prompt_tokens != null
+    ? { inputTokens: usage.prompt_tokens ?? 0, outputTokens: usage.completion_tokens ?? 0 }
+    : null;
+}
 
 /**
  * Mistral, on whichever endpoint the installation named; EU unless it
@@ -65,22 +90,14 @@ export class MistralProvider implements LlmProvider {
     };
   }
 
-  async complete(
-    messages: LlmMessage[],
-    options: LlmCompletionOptions = {},
-  ): Promise<LlmCompletion> {
-    const body = JSON.stringify({
-      model: this.model,
-      messages,
-      temperature: options.temperature ?? 0.2,
-      max_tokens: options.maxTokens ?? 1024,
-      ...(options.responseFormat === "json" ? { response_format: { type: "json_object" } } : {}),
-    });
-
-    // One retry on 429. Mistral answers 429 both for a real rate limit
-    // and for "capacity exceeded", which on the lower tiers means the
-    // model was busy for a second; a person pressing a button once should
-    // not be told to try again for that.
+  /**
+   * The request, with one retry on 429. Mistral answers 429 both for a
+   * real rate limit and for "capacity exceeded", which on the lower
+   * tiers means the model was busy for a second; a person pressing a
+   * button once should not be told to try again for that. What comes
+   * back is a response that is `ok`; everything else has been thrown.
+   */
+  private async post(body: string, timeoutMs: number): Promise<Response> {
     for (let attempt = 0; ; attempt++) {
       let response: Response;
       try {
@@ -88,7 +105,7 @@ export class MistralProvider implements LlmProvider {
           method: "POST",
           headers: this.headers(),
           body,
-          signal: AbortSignal.timeout(options.timeoutMs ?? 30_000),
+          signal: AbortSignal.timeout(timeoutMs),
         });
       } catch {
         throw new LlmError("unreachable", "mistral: network error or timeout");
@@ -112,29 +129,85 @@ export class MistralProvider implements LlmProvider {
           `mistral: HTTP ${response.status}: ${await apiMessage(response)}`,
         );
       }
-
-      let payload: ChatResponse;
-      try {
-        payload = (await response.json()) as ChatResponse;
-      } catch {
-        throw new LlmError("bad_response", "mistral: malformed response body");
-      }
-      const content = payload.choices?.[0]?.message?.content;
-      if (typeof content !== "string") {
-        throw new LlmError("bad_response", "mistral: response carried no content");
-      }
-      return {
-        content,
-        model: payload.model ?? this.model,
-        usage:
-          payload.usage?.prompt_tokens != null
-            ? {
-                inputTokens: payload.usage.prompt_tokens ?? 0,
-                outputTokens: payload.usage.completion_tokens ?? 0,
-              }
-            : null,
-      };
+      return response;
     }
+  }
+
+  async complete(
+    messages: LlmMessage[],
+    options: LlmCompletionOptions = {},
+  ): Promise<LlmCompletion> {
+    const body = JSON.stringify({
+      model: this.model,
+      messages,
+      temperature: options.temperature ?? 0.2,
+      max_tokens: options.maxTokens ?? 1024,
+      ...(options.responseFormat === "json" ? { response_format: { type: "json_object" } } : {}),
+    });
+    const response = await this.post(body, options.timeoutMs ?? 30_000);
+
+    let payload: ChatResponse;
+    try {
+      payload = (await response.json()) as ChatResponse;
+    } catch {
+      throw new LlmError("bad_response", "mistral: malformed response body");
+    }
+    const choice = payload.choices?.[0];
+    const content = choice?.message?.content;
+    if (typeof content !== "string") {
+      throw new LlmError("bad_response", "mistral: response carried no content");
+    }
+    return {
+      content,
+      model: payload.model ?? this.model,
+      usage: usageOf(payload.usage),
+      finish: finishOf(choice?.finish_reason),
+    };
+  }
+
+  /**
+   * The same call as server-sent events. Each event carries a piece of
+   * the answer; the last one carries the reason it stopped and, on
+   * Mistral, the token count. `[DONE]` closes the stream.
+   */
+  async *stream(
+    messages: LlmMessage[],
+    options: Omit<LlmCompletionOptions, "responseFormat"> = {},
+  ): AsyncGenerator<LlmStreamEvent, void, undefined> {
+    const body = JSON.stringify({
+      model: this.model,
+      messages,
+      temperature: options.temperature ?? 0.2,
+      max_tokens: options.maxTokens ?? 1024,
+      stream: true,
+    });
+    const response = await this.post(body, options.timeoutMs ?? 120_000);
+
+    let model = this.model;
+    let usage: LlmUsage = null;
+    let finish: LlmFinish = "unknown";
+    try {
+      for await (const line of readLines(response.body)) {
+        const data = sseData(line);
+        if (data === null) continue;
+        let chunk: ChatChunk;
+        try {
+          chunk = JSON.parse(data) as ChatChunk;
+        } catch {
+          throw new LlmError("bad_response", "mistral: malformed stream event");
+        }
+        if (chunk.model) model = chunk.model;
+        if (chunk.usage) usage = usageOf(chunk.usage);
+        const choice = chunk.choices?.[0];
+        const text = choice?.delta?.content;
+        if (typeof text === "string" && text.length > 0) yield { type: "delta", text };
+        if (choice?.finish_reason) finish = finishOf(choice.finish_reason);
+      }
+    } catch (error) {
+      if (error instanceof LlmError) throw error;
+      throw new LlmError("unreachable", "mistral: the stream broke off");
+    }
+    yield { type: "done", model, usage, finish };
   }
 
   /** GET /models validates the key and reachability without token spend. */

@@ -8,9 +8,12 @@ export { LlmError } from "./types";
 export type {
   LlmCompletion,
   LlmCompletionOptions,
+  LlmFinish,
   LlmHealth,
   LlmMessage,
   LlmProvider,
+  LlmStreamEvent,
+  LlmUsage,
 } from "./types";
 
 export { DEFAULT_MODEL } from "./models";
@@ -20,7 +23,7 @@ export type { LlmProviderId } from "./models";
  * What a provider needs to exist. Neither address is part of it on
  * purpose: both the Ollama address and the Mistral endpoint come from the
  * environment, so no caller — a workspace setting included — can point
- * the server at an address of its choosing, or move where a project's
+ * the server at an address of its choosing, or move where a person's
  * text is processed.
  */
 export type LlmConfig = {
@@ -64,11 +67,11 @@ export function llmProviderFrom(config: LlmConfig): LlmProvider | null {
 }
 
 /**
- * Provider registry, same pattern as the CVR adapter: the environment
- * decides, features just ask. Returns null when AI is disabled
- * (LLM_PROVIDER=none, the default) — callers must handle that and
- * degrade gracefully. A workspace that chose its own model goes through
- * `resolveLlmConfig` in src/modules/ai/model-settings instead.
+ * Provider registry: the environment decides, features just ask. Returns
+ * null when AI is disabled (LLM_PROVIDER=none, the default) — callers
+ * must handle that and degrade gracefully. A workspace that chose its
+ * own model goes through `resolveLlmConfig` in
+ * src/modules/ai/model-settings instead.
  */
 export function getLlmProvider(): LlmProvider | null {
   return llmProviderFrom(installationLlmConfig());

@@ -194,7 +194,7 @@ codebase to:
   chat needs; the six product tables with RLS, per-person policies,
   audit and isolation tests; the Python POC moved to `poc/`; this file;
   the repository.
-- Wave 1: streaming in `src/core/llm` — `stream()` beside `complete()`
+- Wave 1 (done): streaming in `src/core/llm` — `stream()` beside `complete()`
   for Mistral and Ollama, tested against a fake model, written so the
   siblings can take it back (ADR 0011).
 - Wave 2: the conversation — conversations and messages behind the

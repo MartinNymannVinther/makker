@@ -1,13 +1,16 @@
 /**
  * LLM adapter boundary (CLAUDE.md): all model access goes through this
  * interface, providers prefer EU-hosted (Mistral) or local/self-hosted
- * (Ollama-compatible) endpoints, and nothing an AI drafts leaves the
- * house without explicit human approval — enforced by the features that
- * use this, not here.
+ * (Ollama-compatible) endpoints, and nothing an AI writes leaves the
+ * house without a person — enforced by the features that use this, not
+ * here.
  *
- * Deliberately minimal for the first slice: chat completion with an
- * optional JSON mode (signal scoring will want structured output) and a
- * health check that validates configuration without burning tokens.
+ * Two doors. `complete` answers with one completion, optionally as a JSON
+ * object, and is what the family's tools use for proposals. `stream`
+ * answers with the tokens as they arrive, which is what a conversation
+ * lives on (docs/adr/0011); it ends with the same usage and model the
+ * completion would have carried, so a caller can record either the same
+ * way. A health check validates configuration without burning tokens.
  */
 
 export type LlmMessage = {
@@ -25,11 +28,26 @@ export type LlmCompletionOptions = {
   timeoutMs?: number;
 };
 
+/**
+ * Why the model stopped. `length` means it hit the token ceiling
+ * mid-sentence, which a conversation shows and offers to continue from;
+ * `unknown` is a provider that did not say.
+ */
+export type LlmFinish = "stop" | "length" | "unknown";
+
+export type LlmUsage = { inputTokens: number; outputTokens: number } | null;
+
 export type LlmCompletion = {
   content: string;
   model: string;
-  usage: { inputTokens: number; outputTokens: number } | null;
+  usage: LlmUsage;
+  finish: LlmFinish;
 };
+
+/** What a stream yields: text as it comes, then one closing event. */
+export type LlmStreamEvent =
+  | { type: "delta"; text: string }
+  | { type: "done"; model: string; usage: LlmUsage; finish: LlmFinish };
 
 export type LlmHealth =
   | { ok: true; detail: string }
@@ -43,6 +61,17 @@ export interface LlmProvider {
   /** The model completions will use. */
   readonly model: string;
   complete(messages: LlmMessage[], options?: LlmCompletionOptions): Promise<LlmCompletion>;
+  /**
+   * The same call, token by token. Errors before the first token throw
+   * the same `LlmError` as `complete`; a connection that breaks
+   * mid-answer throws `unreachable` from the iterator, after whatever
+   * text got through. JSON mode is not offered here: a partial object is
+   * not a thing to show anyone.
+   */
+  stream(
+    messages: LlmMessage[],
+    options?: Omit<LlmCompletionOptions, "responseFormat">,
+  ): AsyncGenerator<LlmStreamEvent, void, undefined>;
   /** Cheap configuration probe: auth/reachability, no token spend. */
   healthCheck(): Promise<LlmHealth>;
 }

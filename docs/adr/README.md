@@ -30,3 +30,4 @@ session reads, and **TECH-DEBT.md** is what we know is not right yet.
 | [0008](0008-ai-reads-on-their-own-route.md)   | An AI read is a route, not an action                                   |           |
 | [0009](0009-ai-installation-roof.md)          | The installation's own roof over the AI                                |           |
 | [0010](0010-a-conversation-is-one-persons.md) | A conversation is one person's — RLS reads the person too              | → 0002    |
+| [0011](0011-streaming-in-the-adapter.md)      | Streaming in the adapter — `stream()` beside `complete()`              |           |
