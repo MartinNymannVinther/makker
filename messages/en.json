@@ -538,9 +538,64 @@
   "chat": {
     "title": "Conversations",
     "subtitle": "What you think out loud about. Only you can see it.",
+    "untitled": "Untitled",
+    "new": "New conversation",
+    "listLabel": "Your conversations",
+    "list": {
+      "empty": "No conversations yet."
+    },
     "empty": {
-      "title": "No conversations yet",
-      "hint": "The conversation itself arrives in the next wave. The foundation stands: login, workspaces, roles and settings."
+      "title": "What is on your mind?",
+      "hint": "Write the way you talk. Attach minutes or a draft, pick a role, and get an answer that stays here. Only you can see the conversation.",
+      "tasks": "Or start with a task"
+    },
+    "composer": {
+      "placeholder": "Write here …",
+      "inputLabel": "Your message",
+      "noModel": "No language model is set up. An owner or administrator can choose one under Settings → AI.",
+      "send": "Send",
+      "sending": "Sending …",
+      "attach": "Attach",
+      "tasks": "Tasks",
+      "role": "Role",
+      "noRole": "No role",
+      "hint": "Enter sends · Shift+Enter new line",
+      "files": {
+        "uploading": "Uploading …",
+        "noText": "no text could be read out",
+        "remove": "Remove {name}",
+        "failed": "The files could not be uploaded.",
+        "reasons": {
+          "tooBig": "too big (20 MB at most)",
+          "unsupported": "type not supported (PDF, Word, text, Markdown, CSV or JSON)",
+          "empty": "empty",
+          "generic": "could not be saved"
+        }
+      }
+    },
+    "thinking": "The model is thinking …",
+    "truncated": "The answer was cut off at the length ceiling.",
+    "continue": "Continue",
+    "failed": {
+      "noModel": "No language model is set up for the workspace.",
+      "rateLimited": "The ceiling on AI calls has been reached. Try again shortly.",
+      "unreachable": "The model does not answer.",
+      "badAnswer": "The model did not answer with anything usable.",
+      "generic": "Something went wrong.",
+      "invalid": "The message could not be sent.",
+      "notFound": "The conversation was not found.",
+      "unauthorized": "You are not signed in.",
+      "empty": "The model answered nothing. Try again — a local model can answer empty the first time it loads."
+    },
+    "header": {
+      "untitled": "Untitled",
+      "rename": "Rename",
+      "renameLabel": "The conversation's title",
+      "save": "Save",
+      "delete": "Delete",
+      "deleteTitle": "Delete the conversation?",
+      "deleteBody": "The conversation, every message in it and the files you attached are deleted for good. Take an export first if you want to keep it.",
+      "deleteConfirm": "Delete the conversation"
     }
   }
 }

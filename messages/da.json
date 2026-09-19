@@ -538,9 +538,64 @@
   "chat": {
     "title": "Samtaler",
     "subtitle": "Det du tænker højt om. Kun du kan se det.",
+    "untitled": "Uden titel",
+    "new": "Ny samtale",
+    "listLabel": "Dine samtaler",
+    "list": {
+      "empty": "Ingen samtaler endnu."
+    },
     "empty": {
-      "title": "Ingen samtaler endnu",
-      "hint": "Selve samtalen kommer i næste bølge. Fundamentet står: login, arbejdsrum, roller og indstillinger."
+      "title": "Hvad tænker du på?",
+      "hint": "Skriv som du taler. Vedhæft et referat eller et udkast, vælg en rolle, og få et svar der bliver her. Kun du kan se samtalen.",
+      "tasks": "Eller start med en opgave"
+    },
+    "composer": {
+      "placeholder": "Skriv her …",
+      "inputLabel": "Din besked",
+      "noModel": "Der er ingen sprogmodel sat op. En ejer eller administrator kan vælge en under Indstillinger → AI.",
+      "send": "Send",
+      "sending": "Sender …",
+      "attach": "Vedhæft",
+      "tasks": "Opgaver",
+      "role": "Rolle",
+      "noRole": "Ingen rolle",
+      "hint": "Enter sender · Shift+Enter ny linje",
+      "files": {
+        "uploading": "Uploader …",
+        "noText": "ingen tekst kunne læses ud",
+        "remove": "Fjern {name}",
+        "failed": "Filerne kunne ikke uploades.",
+        "reasons": {
+          "tooBig": "for stor (højst 20 MB)",
+          "unsupported": "typen understøttes ikke (PDF, Word, tekst, Markdown, CSV eller JSON)",
+          "empty": "tom",
+          "generic": "kunne ikke gemmes"
+        }
+      }
+    },
+    "thinking": "Modellen tænker …",
+    "truncated": "Svaret blev afbrudt ved loftet for længde.",
+    "continue": "Fortsæt",
+    "failed": {
+      "noModel": "Der er ingen sprogmodel sat op for arbejdsrummet.",
+      "rateLimited": "Loftet for AI-kald er nået. Prøv igen om lidt.",
+      "unreachable": "Modellen svarer ikke.",
+      "badAnswer": "Modellen svarede ikke med noget der kunne bruges.",
+      "generic": "Noget gik galt.",
+      "invalid": "Beskeden kunne ikke sendes.",
+      "notFound": "Samtalen blev ikke fundet.",
+      "unauthorized": "Du er ikke logget ind.",
+      "empty": "Modellen svarede tomt. Prøv igen — en lokal model kan svare tomt første gang den læses ind."
+    },
+    "header": {
+      "untitled": "Uden titel",
+      "rename": "Omdøb",
+      "renameLabel": "Samtalens titel",
+      "save": "Gem",
+      "delete": "Slet",
+      "deleteTitle": "Slet samtalen?",
+      "deleteBody": "Samtalen, alle dens beskeder og de filer du vedhæftede, slettes for altid. Hent en eksport først, hvis du vil beholde den.",
+      "deleteConfirm": "Slet samtalen"
     }
   }
 }

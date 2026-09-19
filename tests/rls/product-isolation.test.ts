@@ -212,6 +212,42 @@ describe.each(TABLES.filter((spec) => !spec.personal).map((spec) => spec.table))
   },
 );
 
+describe("a line and a file follow their conversation (drizzle/0004)", () => {
+  it("refuses a colleague's line into somebody else's conversation, even in their own name", async () => {
+    const code = await expectSqlError(
+      asApp(app, A2, (c) =>
+        c.query(
+          `insert into messages (org_id, user_id, conversation_id, role, content)
+           values ($1, $2, 'conv_a', 'user', 'smuglet ind')`,
+          [A2.orgId, A2.userId],
+        ),
+      ),
+    );
+    expect(code).toBe("42501");
+  });
+
+  it("refuses a colleague's file into somebody else's conversation, and allows one with none", async () => {
+    const into = await expectSqlError(
+      asApp(app, A2, (c) =>
+        c.query(
+          `insert into files (org_id, user_id, conversation_id, name, mime, size, bytes)
+           values ($1, $2, 'conv_a', 'x.txt', 'text/plain', 1, $3)`,
+          [A2.orgId, A2.userId, Buffer.from("x")],
+        ),
+      ),
+    );
+    expect(into).toBe("42501");
+    const loose = await asApp(app, A2, (c) =>
+      c.query(
+        `insert into files (org_id, user_id, conversation_id, name, mime, size, bytes)
+         values ($1, $2, null, 'x.txt', 'text/plain', 1, $3) returning id`,
+        [A2.orgId, A2.userId, Buffer.from("x")],
+      ),
+    );
+    expect(loose.rowCount).toBe(1);
+  });
+});
+
 describe("the export path", () => {
   it("reads through RLS, so one person's export cannot contain another's rows", async () => {
     const rows = await asApp(app, A, (c) => c.query(`select org_id, user_id from conversations`));

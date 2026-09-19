@@ -197,7 +197,7 @@ codebase to:
 - Wave 1 (done): streaming in `src/core/llm` — `stream()` beside `complete()`
   for Mistral and Ollama, tested against a fake model, written so the
   siblings can take it back (ADR 0011).
-- Wave 2: the conversation — conversations and messages behind the
+- Wave 2 (done): the conversation — conversations and messages behind the
   per-person policy, the SSE chat route through the AI door, the chat
   page with the list and the writing field, files as text, the title
   proposed by the model, per-person export (ADR 0010).
