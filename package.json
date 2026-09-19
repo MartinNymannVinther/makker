@@ -1,6 +1,6 @@
 {
   "name": "makker",
-  "version": "0.1.0",
+  "version": "0.9.0",
   "description": "Open source chat to think out loud with, on EU-hosted or local models. Part of the Haij family.",
   "license": "AGPL-3.0-only",
   "private": true,

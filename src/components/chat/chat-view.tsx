@@ -7,26 +7,21 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "@/i18n/navigation";
 import { scan, type PiiSettings, type ScanResult } from "@/lib/pii";
 import { askAi } from "@/modules/ai/read-client";
-import { discardFileAction, setConversationRoleAction } from "@/modules/chat/actions";
-import { decodeEvents, type ChatFailure, type ChatStreamEvent } from "@/modules/chat/wire";
+import { setConversationRoleAction } from "@/modules/chat/actions";
+import type { ChatFailure, ChatStreamEvent } from "@/modules/chat/wire";
+import { ChatEmpty } from "./chat-empty";
 import { Composer, type RoleOption, type TaskOption } from "./composer";
 import { ConversationTitle } from "./conversation-title";
 import { DocumentButtons } from "./document-buttons";
 import { MessageItem, type ChatFile, type ChatLine } from "./message-item";
-import { PiiNotice } from "./pii-notice";
+import { PiiBar } from "./pii-bar";
+import { readChatStream } from "./stream";
+import { usePendingFiles } from "./use-pending-files";
 
 type Conversation = { id: string; title: string; roleId: string | null };
 
 /** The filter's tuning, from the workspace's settings; `enabled` is the administrator's switch. */
 export type PiiConfig = PiiSettings & { enabled: boolean; blockOnHint: boolean };
-
-type UploadAnswer = {
-  ok: boolean;
-  results?: Array<
-    | { name: string; ok: true; file: { id: string; name: string; size: number; hasText: boolean } }
-    | { name: string; ok: false; reason: "tooBig" | "unsupported" | "empty" }
-  >;
-};
 
 /**
  * The conversation itself: the lines so far, the one being written, and
@@ -59,10 +54,11 @@ export function ChatView({
   const [title, setTitle] = useState(conversation?.title ?? "");
   const [lines, setLines] = useState<ChatLine[]>(initial);
   const [files, setFiles] = useState<ChatFile[]>(initialFiles);
-  const [pendingFiles, setPendingFiles] = useState<ChatFile[]>([]);
+  const { pendingFiles, setPendingFiles, uploading, pickFiles, removeFile } = usePendingFiles(
+    conversation?.id ?? null,
+  );
   const [writing, setWriting] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const [uploading, setUploading] = useState(false);
   const [draft, setDraft] = useState("");
   const [roleId, setRoleId] = useState<string | null>(conversation?.roleId ?? null);
   const [failure, setFailure] = useState<ChatFailure | null>(null);
@@ -80,7 +76,6 @@ export function ChatView({
   const piiBlocks =
     piiResult !== null &&
     (piiResult.findings.length > 0 || (pii.blockOnHint && piiResult.hints.length > 0));
-  const piiShows = piiResult !== null && (piiBlocks || piiResult.hints.length > 0);
 
   useEffect(() => {
     scroller.current?.scrollTo({ top: scroller.current.scrollHeight });
@@ -137,9 +132,6 @@ export function ChatView({
         }
         return;
       }
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let rest = "";
       const handle = (event: ChatStreamEvent) => {
         if (event.type === "meta") {
           conversationId = event.conversationId;
@@ -171,16 +163,7 @@ export function ChatView({
           setFailure(event.error);
         }
       };
-      for (;;) {
-        const { value, done } = await reader.read();
-        if (done) break;
-        rest += decoder.decode(value, { stream: true });
-        const decoded = decodeEvents(rest);
-        rest = decoded.rest;
-        decoded.events.forEach(handle);
-      }
-      const tail = decodeEvents(rest + "\n\n");
-      tail.events.forEach(handle);
+      await readChatStream(response.body, handle);
     } catch {
       setFailure("generic");
     }
@@ -196,36 +179,6 @@ export function ChatView({
       if (!conversation) router.replace(`/chat/${conversationId}`);
       else router.refresh();
     }
-  }
-
-  async function pickFiles(list: FileList) {
-    setUploading(true);
-    const form = new FormData();
-    if (conversation) form.set("conversationId", conversation.id);
-    for (const file of Array.from(list)) form.append("files", file);
-    try {
-      const response = await fetch("/api/files", { method: "POST", body: form });
-      const answer = (await response.json()) as UploadAnswer;
-      if (!response.ok || !answer.ok || !answer.results) {
-        toast.error(t("composer.files.failed"));
-        return;
-      }
-      const accepted: ChatFile[] = [];
-      for (const result of answer.results) {
-        if (result.ok) accepted.push({ ...result.file, messageId: null });
-        else toast.error(`${result.name}: ${t(`composer.files.reasons.${result.reason}`)}`);
-      }
-      setPendingFiles((was) => [...was, ...accepted]);
-    } catch {
-      toast.error(t("composer.files.failed"));
-    } finally {
-      setUploading(false);
-    }
-  }
-
-  async function removeFile(fileId: string) {
-    setPendingFiles((was) => was.filter((f) => f.id !== fileId));
-    await discardFileAction({ fileId });
   }
 
   async function chooseRole(next: string | null) {
@@ -275,31 +228,7 @@ export function ChatView({
       >
         <div className="mx-auto flex w-full max-w-4xl flex-col gap-3">
           {lines.length === 0 && writing === null ? (
-            <div className="my-auto flex flex-col gap-2 py-10">
-              <h1 className="text-2xl font-semibold tracking-[-0.02em]">{t("empty.title")}</h1>
-              <p className="text-muted-foreground max-w-prose text-reading leading-relaxed text-pretty">
-                {modelConfigured ? t("empty.hint") : t("composer.noModel")}
-              </p>
-              {tasks.length > 0 && modelConfigured ? (
-                <div className="mt-4 flex flex-col gap-2">
-                  <p className="text-meta text-2sm font-medium">{t("empty.tasks")}</p>
-                  <ul className="grid gap-2 sm:grid-cols-2">
-                    {tasks.slice(0, 6).map((task) => (
-                      <li key={task.id}>
-                        <button
-                          type="button"
-                          onClick={() => applyTask(task)}
-                          className="border-border bg-card hover:bg-muted flex w-full flex-col items-start gap-0.5 rounded-lg border px-3 py-2 text-left transition-colors"
-                        >
-                          <span className="text-2sm font-medium">{task.name}</span>
-                          <span className="text-meta text-xs">{task.description}</span>
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ) : null}
-            </div>
+            <ChatEmpty tasks={tasks} modelConfigured={modelConfigured} onTask={applyTask} />
           ) : null}
           {lines.map((line) => (
             <MessageItem
@@ -335,34 +264,25 @@ export function ChatView({
           ) : null}
         </div>
       </div>
-      {piiShows && piiResult ? (
-        <div className="px-4 pb-2 sm:px-6">
-          <PiiNotice
-            result={piiResult}
-            blocking={piiBlocks}
-            onEdit={() => {
-              const first = piiResult.findings[0];
-              focusDraft(first ? { start: first.start, end: first.end } : undefined);
-            }}
-            onSendAnyway={() => {
-              setPiiApproved(true);
-              void send(false, true);
-            }}
-            onDisable={() => {
-              setPiiOff(true);
-              focusDraft();
-            }}
-          />
-        </div>
-      ) : null}
-      {pii.enabled && piiOff ? (
-        <p className="text-meta px-4 pb-1 text-xs sm:px-6">
-          {t("pii.off")}{" "}
-          <button type="button" className="underline" onClick={() => setPiiOff(false)}>
-            {t("pii.enable")}
-          </button>
-        </p>
-      ) : null}
+      <PiiBar
+        result={piiResult}
+        blocking={piiBlocks}
+        enabled={pii.enabled}
+        off={piiOff}
+        onEdit={() => {
+          const first = piiResult?.findings[0];
+          focusDraft(first ? { start: first.start, end: first.end } : undefined);
+        }}
+        onSendAnyway={() => {
+          setPiiApproved(true);
+          void send(false, true);
+        }}
+        onDisable={() => {
+          setPiiOff(true);
+          focusDraft();
+        }}
+        onEnable={() => setPiiOff(false)}
+      />
       <Composer
         draft={draft}
         onDraft={setDraft}

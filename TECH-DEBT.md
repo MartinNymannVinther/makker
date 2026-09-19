@@ -50,6 +50,14 @@ is Domino's example, not a feature of Makker. Each carries a line at the
 top saying so. Rewriting them for Makker's examples is worth doing once
 the product has examples of its own.
 
+### The filter's "off for this conversation" lasts the page
+
+Switching the filter off for a conversation (ADR 0013) is state in the
+chat page: reload, and it is on again. That is deliberate for now — the
+administrator is the right person to switch it off for good — but a
+person who is asked three times in one afternoon will disagree. A
+per-conversation flag in the database is small work once somebody asks.
+
 ### Every message is audited, content included
 
 The audit trigger on `messages` writes every line of every conversation

@@ -24,13 +24,16 @@ Decisions and their trade-offs live in [docs/adr](docs/adr/).
 
 ## Status
 
-0.1, wave 0: the foundation from Domino (auth with passkeys and TOTP,
-workspaces separated in the database, admission by invitation, the
-audit log, CI, Docker), the product's tables with RLS, audit and
-isolation tests, and an empty front door. The conversation itself, the
-roles, the files and the exports arrive wave by wave (CLAUDE.md,
-roadmap). Nothing has run real work yet; dogma seven is what 1.0 waits
-for.
+0.9, waves 0 to 5 built: the foundation from Domino (auth with passkeys
+and TOTP, workspaces separated in the database, admission by invitation,
+the audit log, CI, Docker), the product's tables with per-person
+policies and isolation tests, streaming in the adapter, the conversation
+with files and a title the model proposes, the library of prompt, roles
+and tasks under Settings, Word and PowerPoint in two steps, the
+personal-data filter in the browser, and the demo. Everything here has
+run against a local model on one machine; nobody has thought out loud
+in it for a real week yet. Dogma seven is what 1.0 waits for, and
+[docs/launch.md](docs/launch.md) is the road to it.
 
 Makker grew out of a Python proof of concept that showed the whole
 product on one machine with no database and no login. It lives on in
