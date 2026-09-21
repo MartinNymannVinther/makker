@@ -36,6 +36,13 @@
       "when": 1789800589239,
       "tag": "0004_personal_rows_follow_their_conversation",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1789994881363,
+      "tag": "0005_audit_rows_about_a_person",
+      "breakpoints": true
     }
   ]
 }

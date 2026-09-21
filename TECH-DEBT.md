@@ -58,19 +58,6 @@ administrator is the right person to switch it off for good — but a
 person who is asked three times in one afternoon will disagree. A
 per-conversation flag in the database is small work once somebody asks.
 
-### Every message is audited, content included
-
-The audit trigger on `messages` writes every line of every conversation
-into `audit_log` a second time. Dogma six asks for every change to land
-in a log that cannot be edited, and a conversation is a change; but the
-log doubles the storage of the product's largest table and, unlike the
-rows it copies, is not scoped to the person by policy — the workspace's
-`app_select_audit` policy reads `org_id` alone. Nobody in the
-application reads the audit log yet, and the export hands each person
-the whole workspace's audit tab. Before 1.0 that has to be decided: a
-per-person policy on `audit_log` for rows about personal tables, or no
-content in the audit row for messages.
-
 ## Accepted, with the reason written down
 
 ### The content policy still allows inline scripts
@@ -121,6 +108,17 @@ costs nothing while it waits.
 lint, format, typecheck, CI and the Docker image, and nothing imports
 it. It will stop running against new Python and library versions, and
 that is accepted: it is read more than run (ADR 0001).
+
+## Paid
+
+### Every message was audited, and the audit tab was the workspace's
+
+The triggers copy every message into `audit_log`, and until the release
+review the log's policy read `org_id` alone — so the export's audit tab
+handed a member their colleagues' lines. Closed 2026-09-21 by ADR 0014
+and drizzle/0005: rows about personal tables are visible to the person
+who caused them. Found by reading, not by a person; the isolation test
+now holds it.
 
 ## Waiting for real use
 

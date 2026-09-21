@@ -76,7 +76,8 @@ What follows for the rest of dogma three:
 - **The audit log is wider than the policy.** `audit_log` copies every
   message and is read by the workspace's `org_id` policy alone. Nobody
   reads it in the application yet; TECH-DEBT.md carries the decision
-  that must be made before 1.0.
+  that must be made before 1.0. _Closed by ADR 0014: the log reads the
+  person too for rows about personal tables._
 - **Two ownership models in one schema.** A reader of the policies has
   to know which tables are personal. The schema files say it in their
   comments, the isolation test says it in a list, and this ADR is what

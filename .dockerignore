@@ -8,3 +8,6 @@ Dockerfile
 docker-compose*.yml
 docs
 README.md
+# The Python proof of concept and the GitHub metadata are not part of the image.
+poc
+.github

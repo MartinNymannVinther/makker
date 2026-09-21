@@ -51,6 +51,29 @@ export async function asApp<T>(
   }
 }
 
+/** The same as `asApp`, but the write stays: for a row a later assertion has to find. */
+export async function asAppCommit<T>(
+  client: Client,
+  context: TenantContext,
+  query: (client: Client) => Promise<T>,
+): Promise<T> {
+  await client.query("begin");
+  try {
+    if (context) {
+      await client.query(
+        "select set_config('app.org_id', $1, true), set_config('app.user_id', $2, true)",
+        [context.orgId, context.userId],
+      );
+    }
+    const result = await query(client);
+    await client.query("commit");
+    return result;
+  } catch (error) {
+    await client.query("rollback");
+    throw error;
+  }
+}
+
 /** Error code helper: runs the query and returns the Postgres error code. */
 export async function expectSqlError(promise: Promise<unknown>): Promise<string> {
   try {

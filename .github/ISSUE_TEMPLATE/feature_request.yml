@@ -5,10 +5,11 @@ body:
   - type: markdown
     attributes:
       value: >-
-        Makker keeps its brick count deliberately low — nine in 0.9 —
-        and the omissions are part of the product. An idea that earns a
-        new brick or a new concept has to be worth it, so say what
-        problem it solves before what it should look like.
+        Makker keeps its concept count deliberately low — a conversation,
+        a role, a task, a file, a document — and the omissions are part of
+        the product (CLAUDE.md, "deliberately not built"). An idea that
+        earns a new concept has to be worth it, so say what problem it
+        solves before what it should look like.
   - type: textarea
     id: problem
     attributes:

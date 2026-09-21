@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import type { Client, Pool } from "pg";
-import { adminPool, appClient, asApp, expectSqlError } from "../helpers/db";
+import { adminPool, appClient, asApp, asAppCommit, expectSqlError } from "../helpers/db";
 
 /**
  * Workspace isolation for every product table, proven as the application
@@ -252,5 +252,41 @@ describe("the export path", () => {
   it("reads through RLS, so one person's export cannot contain another's rows", async () => {
     const rows = await asApp(app, A, (c) => c.query(`select org_id, user_id from conversations`));
     expect(rows.rows.map((r) => [r.org_id, r.user_id])).toEqual([[A.orgId, A.userId]]);
+  });
+});
+
+describe("the audit log about a person's things (drizzle/0005)", () => {
+  it("shows a colleague nothing of another's conversation, and the workspace's rows to both", async () => {
+    // The seed above wrote rows as the superuser with no context, so
+    // write one line as each person the way the application does.
+    await asAppCommit(app, A, (c) =>
+      c.query(
+        `insert into messages (org_id, user_id, conversation_id, role, content)
+         values ($1, $2, 'conv_a', 'user', 'kun min')`,
+        [A.orgId, A.userId],
+      ),
+    );
+    await asAppCommit(app, A, (c) =>
+      c.query(`update roles set description = 'delt' where id = 'role_a'`),
+    );
+
+    const mine = await asApp(app, A, (c) =>
+      c.query(
+        `select entity_type from audit_log where entity_type = 'messages' and after_data ->> 'content' = 'kun min'`,
+      ),
+    );
+    expect(mine.rows.length).toBe(1);
+    const theirs = await asApp(app, A2, (c) =>
+      c.query(
+        `select 1 from audit_log where entity_type in ('conversations', 'messages', 'files')`,
+      ),
+    );
+    expect(theirs.rows).toEqual([]);
+    const shared = await asApp(app, A2, (c) =>
+      c.query(
+        `select 1 from audit_log where entity_type = 'roles' and after_data ->> 'description' = 'delt'`,
+      ),
+    );
+    expect(shared.rows.length).toBe(1);
   });
 });

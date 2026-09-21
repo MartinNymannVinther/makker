@@ -33,3 +33,4 @@ session reads, and **TECH-DEBT.md** is what we know is not right yet.
 | [0011](0011-streaming-in-the-adapter.md)                              | Streaming in the adapter — `stream()` beside `complete()`              |           |
 | [0012](0012-the-library-is-the-workspaces.md)                         | The library is the workspace's, seeded from the POC on first use       |           |
 | [0013](0013-two-steps-to-a-document-and-the-filter-in-the-browser.md) | Two steps to a document, and the filter stays in the browser           |           |
+| [0014](0014-the-audit-log-reads-the-person-too.md)                    | The audit log reads the person too                                     | → 0010    |

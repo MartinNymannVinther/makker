@@ -60,7 +60,9 @@ looked up at runtime is a version that can lie.
    policies for `makker_app` scoped by `app_current_org_id()`.
 2. Least-privilege grants — nothing gets broad access by default. A table
    that holds one person's things (a conversation, its messages, its
-   files) carries `user_id` too and a policy that reads it (ADR 0010).
+   files) carries `user_id` too and a policy that reads it (ADR 0010),
+   and its name goes into the audit log's policy (ADR 0014), or its
+   audit rows are the workspace's.
 3. An `audit_row_change()` trigger unless the table is technical/high-churn
    (document the exception in an ADR).
 4. Isolation tests in `tests/rls/` proving workspace A cannot read or write
